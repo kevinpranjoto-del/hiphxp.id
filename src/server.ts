@@ -1,0 +1,78 @@
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import compression from 'compression';
+import cookieParser from 'cookie-parser';
+import rateLimit from 'express-rate-limit';
+import { env } from './config/env';
+import { prisma } from './shared/prisma';
+import authRoutes from './modules/auth/routes';
+import contentRoutes from './modules/content/routes';
+import eventRoutes from './modules/events/routes';
+import partnershipRoutes from './modules/partnership/routes';
+import dashboardRoutes from './modules/dashboard/routes';
+
+const app = express();
+
+app.use(helmet());
+app.use(cors({ origin: env.corsOrigin, credentials: true }));
+app.use(compression());
+app.use(cookieParser());
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+app.use(rateLimit({ windowMs: env.rateLimitWindowMs, max: env.rateLimitMax }));
+
+app.get('/health', (_req, res) => res.json({ status: 'ok' }));
+app.get('/maintenance', (_req, res) => res.status(200).json({
+  message: 'Maintenance / Coming Soon',
+  status: 'maintenance',
+  platform: 'HipHXP.id',
+  backend: 'ready',
+}));
+
+app.use('/api/auth', authRoutes);
+app.use('/api/content', contentRoutes);
+app.use('/api/events', eventRoutes);
+app.use('/api/partnerships', partnershipRoutes);
+app.use('/api/dashboard', dashboardRoutes);
+
+app.get('/api/docs', (_req, res) => res.json({
+  message: 'Backend API documentation',
+  endpoints: [
+    '/api/auth/register',
+    '/api/auth/login',
+    '/api/auth/verify-email',
+    '/api/auth/forgot-password',
+    '/api/auth/reset-password',
+    '/api/auth/refresh',
+    '/api/auth/logout',
+    '/api/content/articles',
+    '/api/content/articles/:slug',
+    '/api/events',
+    '/api/partnerships',
+    '/api/partnerships/:id',
+    '/api/dashboard/stats',
+    '/maintenance',
+  ],
+}));
+
+app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  console.error(err);
+  res.status(err.status || 500).json({ message: err.message || 'Internal server error' });
+});
+
+const startServer = async () => {
+  try {
+    await prisma.$connect();
+    app.listen(env.port, () => {
+      console.log(`Server running on http://localhost:${env.port}`);
+    });
+  } catch (error) {
+    console.error('Failed to start server', error);
+    process.exit(1);
+  }
+};
+
+startServer();

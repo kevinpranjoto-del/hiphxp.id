@@ -1,0 +1,83 @@
+name: CI Build and Deploy
+
+permissions:
+  contents: read
+  packages: write
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    name: Build and Push Image to GHCR
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Build
+        run: npm run build
+
+      - name: Build and push to GHCR
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:prod
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+
+  deploy:
+    name: Remote Deploy
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v0.1.8
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          script: |
+            set -euo pipefail
+            IMAGE=${{ secrets.IMAGE_NAME }}
+            if [ -z "$IMAGE" ]; then
+              IMAGE="ghcr.io/${{ github.repository }}:prod"
+            fi
+            PORT=${{ secrets.PORT || '80' }}
+            echo "Using image: $IMAGE"
+            if command -v podman >/dev/null 2>&1; then
+              podman pull "$IMAGE"
+              podman rm -f hiphxp-app || true
+              podman run -d --name hiphxp-app \
+                -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+                -e JWT_ACCESS_SECRET='${{ secrets.JWT_ACCESS_SECRET }}' \
+                -e JWT_REFRESH_SECRET='${{ secrets.JWT_REFRESH_SECRET }}' \
+                -p ${PORT}:4000 "$IMAGE"
+            else
+              docker pull "$IMAGE"
+              docker rm -f hiphxp-app || true
+              docker run -d --name hiphxp-app \
+                -e DATABASE_URL='${{ secrets.DATABASE_URL }}' \
+                -e JWT_ACCESS_SECRET='${{ secrets.JWT_ACCESS_SECRET }}' \
+                -e JWT_REFRESH_SECRET='${{ secrets.JWT_REFRESH_SECRET }}' \
+                -p ${PORT}:4000 "$IMAGE"
+            fi
+            echo "Running migrations on target"
+            if command -v podman >/dev/null 2>&1; then
+              podman run --rm -e DATABASE_URL='${{ secrets.DATABASE_URL }}' "$IMAGE" npx prisma migrate deploy --schema=prisma/schema.prisma
+            else
+              docker run --rm -e DATABASE_URL='${{ secrets.DATABASE_URL }}' "$IMAGE" npx prisma migrate deploy --schema=prisma/schema.prisma
+            fi

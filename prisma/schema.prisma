@@ -1,0 +1,1117 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleName {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  WRITER
+  MUSICIAN
+}
+
+enum UserAccountType {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+  WRITER
+  MUSICIAN
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ArticleStatus {
+  DRAFT
+  REVIEW
+  PUBLISHED
+  SCHEDULED
+  ARCHIVED
+}
+
+enum MediaPlatform {
+  SPOTIFY
+  APPLE_MUSIC
+  YOUTUBE
+  TIKTOK
+  INSTAGRAM
+}
+
+enum EventCategory {
+  FESTIVAL
+  GIG
+  RAP_BATTLE
+  STREET_EVENT
+  WORKSHOP
+  COMPETITION
+}
+
+enum DirectoryStatus {
+  DRAFT
+  ACTIVE
+  REVIEW
+  REJECTED
+}
+
+enum PartnershipStatus {
+  NEW
+  REVIEW
+  APPROVED
+  REJECTED
+  CLOSED
+}
+
+enum NotificationChannel {
+  EMAIL
+  PUSH
+  SYSTEM
+}
+
+enum ActivityType {
+  LOGIN
+  LOGOUT
+  CREATE
+  UPDATE
+  DELETE
+  VERIFY
+  APPROVE
+  REJECT
+}
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        RoleName @unique
+  description String?
+  users       User[]
+  permissions Permission[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
+  @@map("roles")
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  roles       Role[]
+  created_at  DateTime @default(now())
+  updated_at  DateTime @updatedAt
+  deleted_at  DateTime?
+
+  @@map("permissions")
+}
+
+model User {
+  id               String           @id @default(uuid()) @db.Uuid
+  email            String           @unique
+  password_hash    String
+  account_type     UserAccountType  @default(MUSICIAN)
+  role_id          String?          @db.Uuid
+  role             Role?            @relation(fields: [role_id], references: [id])
+  is_active        Boolean          @default(true)
+  email_verified   Boolean          @default(false)
+  last_login_at    DateTime?
+  musician_profile MusicianProfile?
+  author           Author?
+  refresh_tokens   RefreshToken[]
+  password_resets  PasswordResetToken[]
+  email_verifications EmailVerificationToken[]
+  login_history    LoginHistory[]
+  activity_logs    ActivityLog[]
+  notifications    Notification[]
+  articles         Article[]
+  created_at       DateTime         @default(now())
+  updated_at       DateTime         @updatedAt
+  deleted_at       DateTime?
+
+  @@map("users")
+}
+
+model MusicianProfile {
+  id                   String             @id @default(uuid()) @db.Uuid
+  user_id              String             @unique @db.Uuid
+  user                 User               @relation(fields: [user_id], references: [id])
+  artist_name          String
+  real_name            String
+  whatsapp             String?
+  city                 String?
+  label                String?
+  instagram            String?
+  tiktok               String?
+  spotify_artist_url   String?
+  apple_music_url     String?
+  youtube_channel      String?
+  profile_photo        String?
+  bio                  String?
+  verification_status  VerificationStatus @default(PENDING)
+  is_verified          Boolean            @default(false)
+  created_at           DateTime           @default(now())
+  updated_at           DateTime           @updatedAt
+  deleted_at           DateTime?
+
+  @@map("musician_profiles")
+}
+
+model Author {
+  id           String    @id @default(uuid()) @db.Uuid
+  user_id      String?   @unique @db.Uuid
+  user         User?     @relation(fields: [user_id], references: [id])
+  display_name String
+  slug         String    @unique
+  bio          String?
+  photo        String?
+  articles     Article[]
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("authors")
+}
+
+model Category {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String    @unique
+  slug         String    @unique
+  description  String?
+  articles     Article[]
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("categories")
+}
+
+model Tag {
+  id           String        @id @default(uuid()) @db.Uuid
+  name         String        @unique
+  slug         String        @unique
+  articles     ArticleTag[]
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  deleted_at   DateTime?
+
+  @@map("tags")
+}
+
+model Article {
+  id                String              @id @default(uuid()) @db.Uuid
+  title             String
+  excerpt           String?
+  content           String
+  slug              String              @unique
+  featured_image    String?
+  thumbnail         String?
+  status            ArticleStatus       @default(DRAFT)
+  featured          Boolean             @default(false)
+  seo_title         String?
+  meta_description  String?
+  canonical_url     String?
+  og_image          String?
+  keywords          String?
+  schema_org        String?
+  view_count        Int                 @default(0)
+  published_at      DateTime?
+  author_id         String?             @db.Uuid
+  author            Author?             @relation(fields: [author_id], references: [id])
+  category_id       String?             @db.Uuid
+  category          Category?           @relation(fields: [category_id], references: [id])
+  user_id           String?             @db.Uuid
+  user              User?               @relation(fields: [user_id], references: [id])
+  tags              ArticleTag[]
+  media_embeds      ArticleMediaEmbed[]
+  analytics         AnalyticsEvent[]
+  created_at        DateTime            @default(now())
+  updated_at        DateTime            @updatedAt
+  deleted_at        DateTime?
+
+  @@map("articles")
+}
+
+model ArticleTag {
+  id         String   @id @default(uuid()) @db.Uuid
+  article_id String   @db.Uuid
+  article    Article  @relation(fields: [article_id], references: [id])
+  tag_id     String   @db.Uuid
+  tag        Tag      @relation(fields: [tag_id], references: [id])
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+  deleted_at DateTime?
+
+  @@unique([article_id, tag_id])
+  @@map("article_tags")
+}
+
+model ArticleMediaEmbed {
+  id          String        @id @default(uuid()) @db.Uuid
+  article_id  String        @db.Uuid
+  article     Article       @relation(fields: [article_id], references: [id])
+  platform    MediaPlatform
+  embed_url   String
+  embed_code  String?
+  created_at  DateTime      @default(now())
+  updated_at  DateTime      @updatedAt
+  deleted_at  DateTime?
+
+  @@map("article_media_embeds")
+}
+
+model Genre {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String    @unique
+  slug         String    @unique
+  artists      Artist[]
+  songs        Song[]
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("genres")
+}
+
+model Label {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String    @unique
+  slug         String    @unique
+  description  String?
+  artists      Artist[]
+  albums       Album[]
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("labels")
+}
+
+model Producer {
+  id           String    @id @default(uuid()) @db.Uuid
+  name         String    @unique
+  slug         String    @unique
+  bio          String?
+  website      String?
+  instagram    String?
+  songs        Song[]
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("producers")
+}
+
+model Artist {
+  id                 String    @id @default(uuid()) @db.Uuid
+  name               String
+  slug               String    @unique
+  real_name          String?
+  bio                String?
+  city               String?
+  province           String?
+  genre_id           String?   @db.Uuid
+  genre              Genre?    @relation(fields: [genre_id], references: [id])
+  label_id           String?   @db.Uuid
+  label              Label?    @relation(fields: [label_id], references: [id])
+  instagram          String?
+  tiktok             String?
+  youtube            String?
+  spotify            String?
+  website            String?
+  whatsapp           String?
+  email              String?
+  is_verified        Boolean   @default(false)
+  albums             Album[]
+  singles            Single[]
+  songs              Song[]
+  music_reviews      MusicReview[]
+  release_radar      ReleaseRadar[]
+  created_at         DateTime  @default(now())
+  updated_at         DateTime  @updatedAt
+  deleted_at         DateTime?
+
+  @@map("artists")
+}
+
+model Album {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  artist_id    String    @db.Uuid
+  artist       Artist    @relation(fields: [artist_id], references: [id])
+  label_id     String?   @db.Uuid
+  label        Label?    @relation(fields: [label_id], references: [id])
+  cover_image  String?
+  release_date DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("albums")
+}
+
+model Single {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  artist_id    String    @db.Uuid
+  artist       Artist    @relation(fields: [artist_id], references: [id])
+  cover_image  String?
+  release_date DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("singles")
+}
+
+model Song {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  artist_id    String    @db.Uuid
+  artist       Artist    @relation(fields: [artist_id], references: [id])
+  genre_id     String?   @db.Uuid
+  genre        Genre?    @relation(fields: [genre_id], references: [id])
+  producer_id  String?   @db.Uuid
+  producer     Producer? @relation(fields: [producer_id], references: [id])
+  audio_url    String?
+  cover_image  String?
+  release_date DateTime?
+  lyrics       Lyrics?
+  song_meaning SongMeaning?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("songs")
+}
+
+model MusicReview {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  artist_id    String    @db.Uuid
+  artist       Artist    @relation(fields: [artist_id], references: [id])
+  content      String
+  rating       Float?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("music_reviews")
+}
+
+model ReleaseRadar {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  artist_id    String    @db.Uuid
+  artist       Artist    @relation(fields: [artist_id], references: [id])
+  content      String
+  release_date DateTime?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("release_radar")
+}
+
+model Lyrics {
+  id           String    @id @default(uuid()) @db.Uuid
+  song_id      String    @unique @db.Uuid
+  song         Song      @relation(fields: [song_id], references: [id])
+  content      String
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("lyrics")
+}
+
+model SongMeaning {
+  id           String    @id @default(uuid()) @db.Uuid
+  song_id      String    @unique @db.Uuid
+  song         Song      @relation(fields: [song_id], references: [id])
+  content      String
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("song_meanings")
+}
+
+model StreetwearPost {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  city          String?
+  province      String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("streetwear_posts")
+}
+
+model FashionPost {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  city          String?
+  province      String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("fashion_posts")
+}
+
+model GraffitiPost {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  city          String?
+  province      String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("graffiti_posts")
+}
+
+model MuralPost {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  city          String?
+  province      String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("mural_posts")
+}
+
+model DancePost {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  city          String?
+  province      String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("dance_posts")
+}
+
+model GalleryItem {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  description   String?
+  image_url     String?
+  city          String?
+  province      String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("gallery_items")
+}
+
+model Interview {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("interviews")
+}
+
+model Editorial {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("editorials")
+}
+
+model Opinion {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("opinions")
+}
+
+model Longform {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("longforms")
+}
+
+model FeatureStory {
+  id            String    @id @default(uuid()) @db.Uuid
+  title         String
+  slug          String    @unique
+  content       String
+  featured_image String?
+  status        ArticleStatus @default(DRAFT)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("feature_stories")
+}
+
+model ArtistDirectory {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("artist_directories")
+}
+
+model Collective {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("collectives")
+}
+
+model Crew {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("crews")
+}
+
+model CommunityDirectory {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("community_directories")
+}
+
+model Beatmaker {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("beatmakers")
+}
+
+model DanceCrew {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("dance_crews")
+}
+
+model GraffitiArtist {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("graffiti_artists")
+}
+
+model Photographer {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("photographers")
+}
+
+model Videographer {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("videographers")
+}
+
+model Studio {
+  id           String          @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String          @unique
+  logo         String?
+  cover        String?
+  description  String?
+  city         String?
+  province     String?
+  genre        String?
+  instagram    String?
+  tiktok       String?
+  youtube      String?
+  spotify      String?
+  website      String?
+  whatsapp     String?
+  email        String?
+  status       DirectoryStatus @default(DRAFT)
+  is_verified  Boolean         @default(false)
+  created_at   DateTime        @default(now())
+  updated_at   DateTime        @updatedAt
+  deleted_at   DateTime?
+
+  @@map("studios")
+}
+
+model Event {
+  id           String        @id @default(uuid()) @db.Uuid
+  name         String
+  slug         String        @unique
+  venue        String?
+  organizer    String?
+  ticket_url   String?
+  google_maps  String?
+  event_date   DateTime?
+  event_time   String?
+  city         String?
+  province     String?
+  category     EventCategory
+  featured     Boolean       @default(false)
+  capacity     Int?
+  status       ArticleStatus @default(DRAFT)
+  created_at   DateTime      @default(now())
+  updated_at   DateTime      @updatedAt
+  deleted_at   DateTime?
+
+  @@map("events")
+}
+
+model Partnership {
+  id          String            @id @default(uuid()) @db.Uuid
+  name        String
+  company     String?
+  email       String
+  whatsapp    String?
+  service     String?
+  message     String?
+  status      PartnershipStatus @default(NEW)
+  created_at  DateTime          @default(now())
+  updated_at  DateTime          @updatedAt
+  deleted_at  DateTime?
+
+  @@map("partnerships")
+}
+
+model RateCard {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  description  String?
+  price        String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("rate_cards")
+}
+
+model SponsoredContent {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  content      String
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("sponsored_content")
+}
+
+model Promotion {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  content      String
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("promotions")
+}
+
+model AdvertisingOpportunity {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  description  String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("advertising_opportunities")
+}
+
+model BrandCollaboration {
+  id           String    @id @default(uuid()) @db.Uuid
+  title        String
+  slug         String    @unique
+  description  String?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("brand_collaborations")
+}
+
+model FileAsset {
+  id           String    @id @default(uuid()) @db.Uuid
+  filename     String
+  mime_type    String?
+  asset_type   String
+  storage_url  String
+  size_bytes   Int?
+  created_at   DateTime  @default(now())
+  updated_at   DateTime  @updatedAt
+  deleted_at   DateTime?
+
+  @@map("file_assets")
+}
+
+model AnalyticsEvent {
+  id            String    @id @default(uuid()) @db.Uuid
+  article_id    String?   @db.Uuid
+  article       Article?  @relation(fields: [article_id], references: [id])
+  entity_type   String
+  entity_id     String?
+  metric_type   String
+  metric_value  Int       @default(0)
+  source        String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("analytics_events")
+}
+
+model Notification {
+  id            String              @id @default(uuid()) @db.Uuid
+  user_id       String?             @db.Uuid
+  user          User?               @relation(fields: [user_id], references: [id])
+  channel       NotificationChannel
+  title         String
+  message       String
+  is_read       Boolean             @default(false)
+  created_at    DateTime            @default(now())
+  updated_at    DateTime            @updatedAt
+  deleted_at    DateTime?
+
+  @@map("notifications")
+}
+
+model ActivityLog {
+  id            String        @id @default(uuid()) @db.Uuid
+  user_id       String?       @db.Uuid
+  user          User?         @relation(fields: [user_id], references: [id])
+  action        ActivityType
+  entity_type   String?
+  entity_id     String?
+  details       String?
+  ip_address    String?
+  created_at    DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
+  deleted_at    DateTime?
+
+  @@map("activity_logs")
+}
+
+model LoginHistory {
+  id            String    @id @default(uuid()) @db.Uuid
+  user_id       String    @db.Uuid
+  user          User      @relation(fields: [user_id], references: [id])
+  ip_address    String?
+  user_agent    String?
+  success       Boolean   @default(true)
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("login_history")
+}
+
+model ApiLog {
+  id            String    @id @default(uuid()) @db.Uuid
+  method        String
+  path          String
+  status_code   Int
+  ip_address    String?
+  user_agent    String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("api_logs")
+}
+
+model ErrorLog {
+  id            String    @id @default(uuid()) @db.Uuid
+  message       String
+  stack         String?
+  endpoint      String?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("error_logs")
+}
+
+model RefreshToken {
+  id            String    @id @default(uuid()) @db.Uuid
+  user_id       String    @db.Uuid
+  user          User      @relation(fields: [user_id], references: [id])
+  token_hash    String
+  expires_at    DateTime
+  revoked_at    DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("refresh_tokens")
+}
+
+model PasswordResetToken {
+  id            String    @id @default(uuid()) @db.Uuid
+  user_id       String    @db.Uuid
+  user          User      @relation(fields: [user_id], references: [id])
+  token_hash    String
+  expires_at    DateTime
+  used_at       DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("password_reset_tokens")
+}
+
+model EmailVerificationToken {
+  id            String    @id @default(uuid()) @db.Uuid
+  user_id       String    @db.Uuid
+  user          User      @relation(fields: [user_id], references: [id])
+  token_hash    String
+  expires_at    DateTime
+  used_at       DateTime?
+  created_at    DateTime  @default(now())
+  updated_at    DateTime  @updatedAt
+  deleted_at    DateTime?
+
+  @@map("email_verification_tokens")
+}
