@@ -12,6 +12,8 @@ import contentRoutes from './modules/content/routes';
 import eventRoutes from './modules/events/routes';
 import partnershipRoutes from './modules/partnership/routes';
 import dashboardRoutes from './modules/dashboard/routes';
+import songsRoutes from './modules/songs/routes';
+import usersRoutes from './modules/users/routes';
 
 const app = express();
 
@@ -37,6 +39,8 @@ app.use('/api/content', contentRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/partnerships', partnershipRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/songs', songsRoutes);
+app.use('/api/users', usersRoutes);
 
 app.get('/api/docs', (_req, res) => res.json({
   message: 'Backend API documentation',
@@ -50,6 +54,10 @@ app.get('/api/docs', (_req, res) => res.json({
     '/api/auth/logout',
     '/api/content/articles',
     '/api/content/articles/:slug',
+    '/api/songs',
+    '/api/songs/:slug',
+    '/api/users',
+    '/api/users/:id',
     '/api/events',
     '/api/partnerships',
     '/api/partnerships/:id',
