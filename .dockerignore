@@ -3,7 +3,7 @@ npm-debug.log
 Dockerfile
 .dockerignore
 .env
-.dist
+dist
 .vscode
 .git
 .gitignore
