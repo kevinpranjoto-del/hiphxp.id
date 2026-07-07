@@ -140,7 +140,7 @@ router.post('/', requireAuth, upload.fields([{ name: 'audio', maxCount: 1 }, { n
     return res.status(201).json(song);
   } catch (error: any) {
     console.error('[POST /api/songs] Prisma error:', error?.message || error);
-    return res.status(500).json({ message: 'Failed to create song', error: error?.message });
+    return res.status(500).json({ message: `Failed to create song: ${error?.message || error}` });
   }
 });
 
