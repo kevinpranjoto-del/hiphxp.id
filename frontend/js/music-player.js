@@ -4,6 +4,21 @@ let allSongs = [];
 let currentQueue = [];
 let currentIndex = -1;
 
+// Mobile Menu
+document.addEventListener('DOMContentLoaded', () => {
+  const mobileOpen = document.getElementById('mobile-open');
+  const mobileClose = document.getElementById('mobile-close');
+  const mobileMenu = document.getElementById('mobile-menu');
+
+  if (mobileOpen && mobileClose && mobileMenu) {
+    mobileOpen.addEventListener('click', () => mobileMenu.classList.add('open'));
+    mobileClose.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    mobileMenu.querySelectorAll('a').forEach(a => {
+      a.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    });
+  }
+});
+
 // DOM Elements
 const searchInput = document.getElementById('search-input');
 const resultsContainer = document.getElementById('search-results');

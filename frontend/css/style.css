@@ -55,9 +55,12 @@ header.site {
   background: var(--ink); color: var(--paper);
   border-bottom: 2px solid var(--red);
 }
-header.site .wrap { display: flex; align-items: center; justify-content: space-between; height: 74px; }
+header.site .wrap { display: flex; align-items: center; justify-content: space-between; height: 74px; position: relative; }
 header.site .mark-word { color: var(--paper); }
-nav.primary { display: flex; gap: 30px; }
+nav.primary {
+  display: flex; gap: 30px;
+  position: absolute; left: 50%; transform: translateX(-50%);
+}
 nav.primary a {
   font-family: 'JetBrains Mono', monospace; font-size: 12.5px; text-transform: uppercase; letter-spacing: 0.09em;
   color: var(--paper); opacity: 0.72; position: relative; padding: 6px 0;
