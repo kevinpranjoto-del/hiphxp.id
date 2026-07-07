@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { z } from 'zod';
 import { prisma } from '../../shared/prisma';
+import { requireAuth } from '../../shared/authMiddleware';
 
 const router = Router();
 
@@ -75,7 +76,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', requireAuth, async (req: any, res) => {
   try {
     const parsed = updatePartnershipSchema.safeParse(req.body);
     if (!parsed.success) {
@@ -102,7 +103,7 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', requireAuth, async (req: any, res) => {
   try {
     const partnership = await prisma.partnership.updateMany({
       where: { id: req.params.id, deleted_at: null },

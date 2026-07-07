@@ -943,3 +943,133 @@ body.theme-dark {
       .dash-sidebar { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
       .form-grid { grid-template-columns: 1fr; }
     }
+
+/* ================================================================
+   MOBILE RESPONSIVE — Global Additions
+   ================================================================ */
+
+/* Dashboard — Tab navigation scrollable on mobile */
+@media (max-width: 768px) {
+  .dash-nav {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 6px;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .dash-nav::-webkit-scrollbar { display: none; }
+  .dash-tab {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 8px 14px;
+  }
+  .logout {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  /* Dashboard tables — horizontal scroll */
+  .dash-table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Dashboard sec-head */
+  .sec-head h1 { font-size: clamp(28px, 9vw, 48px); }
+
+  /* Dashboard dash-box padding */
+  .dash-box { padding: 20px 16px; }
+  .dash-box h3 { font-size: 18px; }
+}
+
+/* Player Footer — stacked on mobile */
+@media (max-width: 600px) {
+  .player-footer {
+    flex-direction: column;
+    height: auto;
+    padding: 10px 16px 14px;
+    gap: 8px;
+  }
+  .player-info {
+    width: 100%;
+    min-width: 0;
+  }
+  .player-controls {
+    width: 100%;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .player-buttons {
+    justify-content: center;
+  }
+  .progress-container {
+    width: 100%;
+  }
+  .volume-container {
+    width: 100%;
+    justify-content: center;
+  }
+  .volume-slider { width: 100%; max-width: 200px; }
+
+  /* Adjust body padding for taller player footer */
+  body { padding-bottom: 140px; }
+}
+
+/* Auth / Login Page — mobile adjustments */
+@media (max-width: 600px) {
+  .auth-page {
+    padding: 20px 16px 120px;
+    min-height: calc(100vh - 60px);
+  }
+  .auth-box {
+    padding: 24px 16px;
+    border-radius: 12px;
+    max-width: 100%;
+  }
+  .auth-tabs {
+    gap: 4px;
+  }
+  .auth-tab {
+    font-size: 12px;
+    padding: 10px 14px;
+  }
+}
+
+/* Music Page — song card grid on mobile */
+@media (max-width: 600px) {
+  .music-page {
+    padding-top: 70px;
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+  .search-box { margin-bottom: 24px; }
+  .song-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px;
+  }
+  .song-card {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+
+/* Header — fix overflow on very small screens */
+@media (max-width: 380px) {
+  .site .wrap {
+    padding: 0 12px;
+  }
+  .mark-word { font-size: 16px; }
+}
+
+/* General — prevent content overflow */
+@media (max-width: 600px) {
+  .wrap { padding: 0 14px; }
+  img { max-width: 100%; height: auto; }
+  table { font-size: 13px; }
+}

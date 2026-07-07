@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../../shared/prisma';
+import { requireAuth } from '../../shared/authMiddleware';
 
 const router = Router();
 
@@ -59,9 +60,14 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// PATCH /api/users/:id — update user (email, is_active, account_type)
-router.patch('/:id', async (req, res) => {
+// PATCH /api/users/:id — update user (only self, or admin)
+router.patch('/:id', requireAuth, async (req: any, res) => {
   try {
+    // Ownership check: users can only update themselves
+    if (req.user.sub !== req.params.id) {
+      return res.status(403).json({ message: 'Forbidden: You can only update your own account' });
+    }
+
     const { email, is_active, account_type } = req.body;
 
     const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
@@ -94,9 +100,14 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/users/:id — soft delete user
-router.delete('/:id', async (req, res) => {
+// DELETE /api/users/:id — soft delete user (only self)
+router.delete('/:id', requireAuth, async (req: any, res) => {
   try {
+    // Ownership check
+    if (req.user.sub !== req.params.id) {
+      return res.status(403).json({ message: 'Forbidden: You can only delete your own account' });
+    }
+
     const existing = await prisma.user.findUnique({ where: { id: req.params.id } });
     if (!existing || existing.deleted_at) {
       return res.status(404).json({ message: 'User not found' });

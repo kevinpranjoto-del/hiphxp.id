@@ -1,25 +1,9 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import { prisma } from '../../shared/prisma';
-import { verifyAccessToken } from '../../shared/auth';
+import { requireAuth } from '../../shared/authMiddleware';
 import { upload } from '../../utils/upload';
 
 const router = Router();
-
-// Middleware auth sederhana
-const requireAuth = (req: any, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Unauthorized' });
-  }
-  const token = authHeader.split(' ')[1];
-  try {
-    const payload = verifyAccessToken(token);
-    req.user = payload;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: 'Invalid token' });
-  }
-};
 
 // GET /api/artists — list semua artist, filter by city/province/is_verified
 router.get('/', async (req, res) => {
@@ -145,8 +129,8 @@ router.put('/me/profile', requireAuth, upload.single('profile_photo'), async (re
   }
 });
 
-// POST /api/artists — tambah artist baru
-router.post('/', async (req, res) => {
+// POST /api/artists — tambah artist baru (requires auth)
+router.post('/', requireAuth, async (req: any, res) => {
   try {
     const {
       name, slug, real_name, bio, city, province,
@@ -189,8 +173,8 @@ router.post('/', async (req, res) => {
   }
 });
 
-// PATCH /api/artists/:id — update artist
-router.patch('/:id', async (req, res) => {
+// PATCH /api/artists/:id — update artist (requires auth)
+router.patch('/:id', requireAuth, async (req: any, res) => {
   try {
     const existing = await prisma.artist.findUnique({ where: { id: req.params.id } });
     if (!existing || existing.deleted_at) {
@@ -232,8 +216,8 @@ router.patch('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/artists/:id — soft delete
-router.delete('/:id', async (req, res) => {
+// DELETE /api/artists/:id — soft delete (requires auth)
+router.delete('/:id', requireAuth, async (req: any, res) => {
   try {
     const existing = await prisma.artist.findUnique({ where: { id: req.params.id } });
     if (!existing || existing.deleted_at) {

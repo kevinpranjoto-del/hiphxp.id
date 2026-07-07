@@ -1,5 +1,15 @@
 import { submitSong, submitEvent, getMyProfile, updateMyProfile, getMySongs, updateSongStatus, deleteSong, getMyEvents, updateEventStatus, deleteEvent, resolveUrl } from './api.js?v=4';
 
+// ─── XSS Protection ──────────────────────────────────────────────────────────
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
 
 window.initDashboard = function() {
   // Check Auth
@@ -65,18 +75,18 @@ window.initDashboard = function() {
         return `
           <tr style="border-bottom: 1px solid rgba(242,241,236,0.1); font-size: 14px;">
             <td style="padding: 12px 16px;">
-              <img src="${coverUrl}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover;">
+              <img src="${escHtml(coverUrl)}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover;">
             </td>
-            <td style="padding: 12px 16px; font-weight: 600;">${song.title}</td>
-            <td style="padding: 12px 16px; font-family: 'JetBrains Mono', monospace;">${releaseDate}</td>
+            <td style="padding: 12px 16px; font-weight: 600;">${escHtml(song.title)}</td>
+            <td style="padding: 12px 16px; font-family: 'JetBrains Mono', monospace;">${escHtml(releaseDate)}</td>
             <td style="padding: 12px 16px;">
               <span class="status-badge ${statusClass}" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: bold; background: ${song.is_hidden ? 'rgba(255, 193, 7, 0.15)' : 'rgba(40, 167, 69, 0.15)'}; color: ${song.is_hidden ? '#ffc107' : '#28a745'}">
-                ${statusText}
+                ${escHtml(statusText)}
               </span>
             </td>
             <td style="padding: 12px 16px; text-align: right;">
-              <button class="btn-action toggle-song" data-id="${song.id}" data-hidden="${song.is_hidden}" style="background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 8px; font-size: 12px;">${toggleLabel}</button>
-              <button class="btn-action delete-song" data-id="${song.id}" style="background: rgba(220,53,69,0.2); border: 1px solid #dc3545; color: #ff6b6b; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Hapus</button>
+              <button class="btn-action toggle-song" data-id="${escHtml(song.id)}" data-hidden="${song.is_hidden ? 'true' : 'false'}" style="background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 8px; font-size: 12px;">${escHtml(toggleLabel)}</button>
+              <button class="btn-action delete-song" data-id="${escHtml(song.id)}" style="background: rgba(220,53,69,0.2); border: 1px solid #dc3545; color: #ff6b6b; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Hapus</button>
             </td>
           </tr>
         `;
@@ -140,18 +150,18 @@ window.initDashboard = function() {
         return `
           <tr style="border-bottom: 1px solid rgba(242,241,236,0.1); font-size: 14px;">
             <td style="padding: 12px 16px;">
-              <img src="${posterUrl}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover;">
+              <img src="${escHtml(posterUrl)}" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover;">
             </td>
-            <td style="padding: 12px 16px; font-weight: 600;">${event.name}</td>
-            <td style="padding: 12px 16px; font-family: 'JetBrains Mono', monospace;">${eventDate} (${event.city || '-'})</td>
+            <td style="padding: 12px 16px; font-weight: 600;">${escHtml(event.name)}</td>
+            <td style="padding: 12px 16px; font-family: 'JetBrains Mono', monospace;">${escHtml(eventDate)} (${escHtml(event.city || '-')})</td>
             <td style="padding: 12px 16px;">
               <span class="status-badge ${statusClass}" style="padding: 4px 8px; border-radius: 4px; font-size: 11px; font-family: 'JetBrains Mono', monospace; font-weight: bold; background: ${!isActive ? 'rgba(255, 193, 7, 0.15)' : 'rgba(40, 167, 69, 0.15)'}; color: ${!isActive ? '#ffc107' : '#28a745'}">
-                ${statusText}
+                ${escHtml(statusText)}
               </span>
             </td>
             <td style="padding: 12px 16px; text-align: right;">
-              <button class="btn-action toggle-event" data-id="${event.id}" data-status="${event.status}" style="background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 8px; font-size: 12px;">${toggleLabel}</button>
-              <button class="btn-action delete-event" data-id="${event.id}" style="background: rgba(220,53,69,0.2); border: 1px solid #dc3545; color: #ff6b6b; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Hapus</button>
+              <button class="btn-action toggle-event" data-id="${escHtml(event.id)}" data-status="${escHtml(event.status)}" style="background: none; border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 4px; cursor: pointer; margin-right: 8px; font-size: 12px;">${escHtml(toggleLabel)}</button>
+              <button class="btn-action delete-event" data-id="${escHtml(event.id)}" style="background: rgba(220,53,69,0.2); border: 1px solid #dc3545; color: #ff6b6b; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;">Hapus</button>
             </td>
           </tr>
         `;
