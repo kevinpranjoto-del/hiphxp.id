@@ -131,6 +131,8 @@ model User {
   activity_logs    ActivityLog[]
   notifications    Notification[]
   articles         Article[]
+  songs            Song[]
+  events           Event[]
   created_at       DateTime         @default(now())
   updated_at       DateTime         @updatedAt
   deleted_at       DateTime?
@@ -387,6 +389,9 @@ model Song {
   release_date DateTime?
   lyrics       Lyrics?
   song_meaning SongMeaning?
+  user_id      String?   @db.Uuid
+  user         User?     @relation(fields: [user_id], references: [id])
+  is_hidden    Boolean   @default(false)
   created_at   DateTime  @default(now())
   updated_at   DateTime  @updatedAt
   deleted_at   DateTime?
@@ -890,6 +895,9 @@ model Event {
   featured     Boolean       @default(false)
   capacity     Int?
   status       ArticleStatus @default(DRAFT)
+  image_url    String?
+  user_id      String?   @db.Uuid
+  user         User?     @relation(fields: [user_id], references: [id])
   created_at   DateTime      @default(now())
   updated_at   DateTime      @updatedAt
   deleted_at   DateTime?

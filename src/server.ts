@@ -4,6 +4,8 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import fs from 'fs';
+import path from 'path';
 import rateLimit from 'express-rate-limit';
 import { env } from './config/env';
 import { prisma } from './shared/prisma';
@@ -14,10 +16,23 @@ import partnershipRoutes from './modules/partnership/routes';
 import dashboardRoutes from './modules/dashboard/routes';
 import songsRoutes from './modules/songs/routes';
 import usersRoutes from './modules/users/routes';
+import artistsRoutes from './modules/artists/routes';
+import collectivesRoutes from './modules/collectives/routes';
+import lifestyleRoutes from './modules/content/lifestyle.routes';
+import editorialRoutes from './modules/content/editorial.routes';
+import reviewsRoutes from './modules/content/reviews.routes';
 
 const app = express();
 
-app.use(helmet());
+const uploadDir = path.join(process.cwd(), 'public/uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(path.join(uploadDir, 'audio'), { recursive: true });
+  fs.mkdirSync(path.join(uploadDir, 'images'), { recursive: true });
+}
+
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use(cors({ origin: env.corsOrigin, credentials: true }));
 app.use(compression());
 app.use(cookieParser());
@@ -25,6 +40,7 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(rateLimit({ windowMs: env.rateLimitWindowMs, max: env.rateLimitMax }));
+app.use('/public', express.static(path.join(process.cwd(), 'public')));
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/maintenance', (_req, res) => res.status(200).json({
@@ -41,6 +57,11 @@ app.use('/api/partnerships', partnershipRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/songs', songsRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/artists', artistsRoutes);
+app.use('/api/collectives', collectivesRoutes);
+app.use('/api/content/lifestyle', lifestyleRoutes);
+app.use('/api/content/editorials', editorialRoutes);
+app.use('/api/content/reviews', reviewsRoutes);
 
 app.get('/api/docs', (_req, res) => res.json({
   message: 'Backend API documentation',
@@ -61,6 +82,8 @@ app.get('/api/docs', (_req, res) => res.json({
     '/api/events',
     '/api/partnerships',
     '/api/partnerships/:id',
+    '/api/artists',
+    '/api/artists/:slug',
     '/api/dashboard/stats',
     '/maintenance',
   ],

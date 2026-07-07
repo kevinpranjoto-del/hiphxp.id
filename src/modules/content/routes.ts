@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { prisma } from '../../shared/prisma';
+import { requireAuth } from '../../shared/authMiddleware';
 
 const router = Router();
 
@@ -35,7 +36,7 @@ router.get('/articles/:slug', async (req, res) => {
   }
 });
 
-router.post('/articles', async (req, res) => {
+router.post('/articles', requireAuth, async (req: any, res) => {
   try {
     const article = await prisma.article.create({ data: req.body });
     res.status(201).json(article);

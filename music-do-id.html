@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>music.do.id — Suara Jalanan, Rilisan Terbaru</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Work+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0a0a;
+    --paper:#f2f1ec;
+    --grey:#8a8a85;
+    --grey-line: rgba(10,10,10,0.14);
+    --red:#e5342a;
+    --red-dim: rgba(229,52,42,0.14);
+    --radius-cut: 2px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  ::selection{ background:var(--red); color:var(--paper); }
+  a{ color:inherit; text-decoration:none; }
+  .mono{ font-family:'JetBrains Mono', monospace; letter-spacing:0.02em; }
+  .display{ font-family:'Archivo Black', sans-serif; text-transform:uppercase; line-height:0.92; letter-spacing:-0.01em; }
+  .wrap{ max-width:1240px; margin:0 auto; padding:0 28px; }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--red); display:flex; align-items:center; gap:10px; margin-bottom:14px;
+  }
+  .eyebrow::before{ content:''; width:22px; height:2px; background:var(--red); display:inline-block; }
+
+  /* ---------- diagonal bar logo mark (echoes uploaded logo) ---------- */
+  .mark{ display:inline-flex; align-items:center; gap:10px; }
+  .mark svg{ display:block; }
+  .mark-word{ font-family:'Archivo Black', sans-serif; font-size:19px; text-transform:uppercase; letter-spacing:-0.01em; }
+  .mark-word .dot{ color:var(--red); }
+
+  /* ---------- NAV ---------- */
+  header.site{
+    position:sticky; top:0; z-index:50;
+    background:var(--ink); color:var(--paper);
+    border-bottom:2px solid var(--red);
+  }
+  header.site .wrap{ display:flex; align-items:center; justify-content:space-between; height:74px; }
+  header.site .mark-word{ color:var(--paper); }
+  nav.primary{ display:flex; gap:30px; }
+  nav.primary a{
+    font-family:'JetBrains Mono', monospace; font-size:12.5px; text-transform:uppercase; letter-spacing:0.09em;
+    color:var(--paper); opacity:0.72; position:relative; padding:6px 0;
+  }
+  nav.primary a:hover{ opacity:1; }
+  nav.primary a::after{
+    content:''; position:absolute; left:0; bottom:0; height:2px; width:0; background:var(--red);
+    transition:width .2s ease;
+  }
+  nav.primary a:hover::after{ width:100%; }
+  .btn-cta{
+    background:var(--red); color:var(--paper); font-family:'JetBrains Mono',monospace;
+    font-size:12px; text-transform:uppercase; letter-spacing:0.08em; padding:11px 18px;
+    clip-path:polygon(0 0,100% 0,100% 70%,88% 100%,0 100%);
+  }
+  .btn-cta:hover{ background:var(--paper); color:var(--ink); }
+  .navlinks-mobile{ display:none; }
+
+  /* ---------- HERO ---------- */
+  .hero{ background:var(--ink); color:var(--paper); padding:64px 0 0; position:relative; overflow:hidden; }
+  .hero .wrap{ position:relative; z-index:2; }
+  .hero-grid{ display:grid; grid-template-columns:1.35fr 0.9fr; gap:40px; align-items:end; padding-bottom:56px; }
+  .hero h1{ font-size:clamp(48px,7.4vw,104px); }
+  .hero h1 span.hl{ color:var(--red); }
+  .hero p.lede{ margin-top:22px; max-width:480px; font-size:17px; color:rgba(242,241,236,0.72); line-height:1.55; }
+  .hero-side{
+    border-left:2px solid var(--red); padding-left:22px; display:flex; flex-direction:column; gap:16px;
+  }
+  .hero-side .stat{ display:flex; justify-content:space-between; font-family:'JetBrains Mono',monospace; font-size:12.5px; text-transform:uppercase; letter-spacing:0.06em; color:rgba(242,241,236,0.6); border-bottom:1px dashed rgba(242,241,236,0.22); padding-bottom:12px; }
+  .hero-side .stat b{ color:var(--paper); font-size:20px; font-family:'Archivo Black',sans-serif; display:block; }
+
+  .bars-deco{ position:absolute; right:-40px; top:0; bottom:0; width:340px; opacity:0.9; }
+
+  .ticker{
+    background:var(--red); color:var(--ink); overflow:hidden; white-space:nowrap; border-top:2px solid var(--ink);
+  }
+  .ticker-track{ display:inline-block; padding:11px 0; animation:scroll 26s linear infinite; }
+  .ticker-track span{ font-family:'JetBrains Mono',monospace; font-size:12.5px; text-transform:uppercase; letter-spacing:0.08em; margin-right:46px; font-weight:700; }
+  @keyframes scroll{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+  @media (prefers-reduced-motion: reduce){ .ticker-track{ animation:none; } }
+
+  /* ---------- SECTION shell ---------- */
+  section{ padding:88px 0; border-bottom:1px solid var(--grey-line); }
+  .sec-head{ display:flex; justify-content:space-between; align-items:flex-end; gap:24px; margin-bottom:44px; flex-wrap:wrap; }
+  .sec-head h2{ font-size:clamp(30px,4vw,48px); }
+  .sec-head p{ max-width:340px; color:var(--grey); font-size:14.5px; line-height:1.5; }
+
+  /* ---------- MUSIC section ---------- */
+  .music-cols{ display:grid; grid-template-columns:repeat(3,1fr); gap:0; border-top:2px solid var(--ink); border-left:2px solid var(--ink); }
+  .music-col{ border-right:2px solid var(--ink); border-bottom:2px solid var(--ink); padding:30px 26px; position:relative; min-height:250px; display:flex; flex-direction:column; }
+  .music-col .num{ font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--grey); }
+  .music-col h3{ font-size:26px; margin:14px 0 12px; font-family:'Archivo Black',sans-serif; text-transform:uppercase; }
+  .music-col p{ font-size:14px; color:var(--grey); line-height:1.55; flex-grow:1; }
+  .music-col .go{ margin-top:18px; font-family:'JetBrains Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.06em; display:inline-flex; align-items:center; gap:6px; }
+  .music-col:hover{ background:var(--ink); color:var(--paper); }
+  .music-col:hover p{ color:rgba(242,241,236,0.7); }
+  .music-col:hover .num{ color:var(--red); }
+
+  /* article / embed mock */
+  .article-demo{ margin-top:56px; display:grid; grid-template-columns:1fr 1fr; gap:0; border:2px solid var(--ink); }
+  .article-demo .col-a{ padding:34px; border-right:2px solid var(--ink); }
+  .article-demo .col-b{ padding:34px; background:#eae8e0; }
+  .article-demo h4{ font-family:'Archivo Black',sans-serif; font-size:24px; text-transform:uppercase; margin-bottom:14px; }
+  .article-demo .byline{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--grey); margin-bottom:18px; text-transform:uppercase; letter-spacing:0.06em; }
+  .article-demo p.body-text{ font-size:14.5px; line-height:1.7; color:#2b2b2b; margin-bottom:14px; }
+  .embed-label{ font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.08em; color:var(--grey); margin-bottom:8px; display:block; }
+  .embed-box{
+    border:1.5px solid var(--ink); background:var(--paper); padding:14px; margin-bottom:18px;
+    display:flex; align-items:center; gap:12px;
+  }
+  .embed-box:last-child{ margin-bottom:0; }
+  .embed-icon{ width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-family:'Archivo Black',sans-serif; font-size:13px; color:#fff; }
+  .embed-meta b{ display:block; font-size:13.5px; font-family:'Work Sans',sans-serif; font-weight:700; }
+  .embed-meta span{ font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--grey); }
+  .ic-spotify{ background:#1DB954; }
+  .ic-apple{ background:linear-gradient(135deg,#fa5c85,#c644fc); }
+  .ic-yt{ background:#ff0000; }
+  .ic-tiktok{ background:#000; }
+  .ic-ig{ background:radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+
+  /* ---------- LIFESTYLE ---------- */
+  .lifestyle-grid{ display:grid; grid-template-columns:1.2fr 1fr 1fr; gap:22px; }
+  .life-card{
+    position:relative; overflow:hidden; min-height:400px; display:flex; flex-direction:column; justify-content:flex-end;
+    padding:26px; color:var(--paper); clip-path:polygon(0 0,100% 0,100% 96%,92% 100%,0 100%);
+  }
+  .life-1{ background:linear-gradient(160deg,#1a1a1a,#0a0a0a 60%,var(--red) 165%); }
+  .life-2{ background:linear-gradient(200deg,#20201d,#0a0a0a); }
+  .life-3{ background:linear-gradient(180deg,#111,#000); }
+
+  /* moving pattern layer — physically slides sideways, not just a background-position nudge */
+  .life-card::before{
+    content:''; position:absolute; top:0; left:0; width:200%; height:100%;
+    background-repeat:repeat-x; background-size:50% 100%; will-change:transform;
+  }
+  .life-1::before{
+    background-image: repeating-linear-gradient(115deg, transparent 0 26px, rgba(255,255,255,0.12) 26px 28px, transparent 28px 54px);
+    animation: lifeSlide 9s linear infinite;
+  }
+  .life-2::before{
+    background-image: repeating-linear-gradient(60deg, rgba(255,255,255,0.14) 0 4px, transparent 4px 24px);
+    animation: lifeSlideRev 12s linear infinite;
+  }
+  .life-3::before{
+    background-image: repeating-linear-gradient(48deg, rgba(229,52,42,0.5) 0 20px, transparent 20px 42px);
+    animation: lifeSlide 7s linear infinite;
+  }
+  /* static tint sits above the sliding pattern, on top so the artwork still reads as one card */
+  .life-card::after{ content:''; position:absolute; inset:0; }
+  .life-1::after{ background:radial-gradient(circle at 85% 100%, rgba(0,0,0,0.55), transparent 60%); }
+  .life-2::after{ background:radial-gradient(circle at 15% 0%, rgba(0,0,0,0.5), transparent 55%); }
+  .life-3::after{ background:radial-gradient(circle at 75% 20%, rgba(229,52,42,0.5), transparent 55%); }
+
+  @keyframes lifeSlide{
+    from{ transform:translateX(0); }
+    to{ transform:translateX(-50%); }
+  }
+  @keyframes lifeSlideRev{
+    from{ transform:translateX(-50%); }
+    to{ transform:translateX(0); }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .life-card::before{ animation:none; }
+  }
+  .life-card .tag{ position:relative; z-index:2; font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.09em; color:var(--red); margin-bottom:10px; }
+  .life-card h3{ position:relative; z-index:2; font-size:27px; font-family:'Archivo Black',sans-serif; text-transform:uppercase; }
+  .life-card p{ position:relative; z-index:2; font-size:13px; margin-top:8px; color:rgba(242,241,236,0.72); max-width:230px; }
+
+  /* ---------- FEATURES / editorial ---------- */
+  .feature-editorial{ display:grid; grid-template-columns:0.85fr 1.15fr; gap:48px; align-items:center; }
+  .feature-visual{
+    aspect-ratio:4/5; background:linear-gradient(150deg,#101010,#050505 55%, var(--red) 200%);
+    position:relative; clip-path:polygon(0 0,92% 0,100% 8%,100% 100%,8% 100%,0 92%);
+  }
+  .feature-visual::after{
+    content:'INTERVIEW'; position:absolute; bottom:22px; left:22px; color:var(--paper);
+    font-family:'Archivo Black',sans-serif; font-size:15px; letter-spacing:0.02em;
+  }
+  .feature-quote{ font-family:'Archivo Black',sans-serif; text-transform:none; font-size:clamp(22px,2.6vw,32px); line-height:1.28; margin-bottom:22px; }
+  .feature-quote .red{ color:var(--red); }
+  .feature-meta{ display:flex; align-items:center; gap:14px; margin-top:26px; }
+  .feature-avatar{ width:46px; height:46px; background:var(--ink); flex-shrink:0; clip-path:polygon(0 0,100% 0,100% 78%,78% 100%,0 100%); }
+  .feature-meta b{ display:block; font-size:14px; }
+  .feature-meta span{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--grey); }
+
+  /* ---------- COMMUNITY HUB ---------- */
+  .community{ background:var(--ink); color:var(--paper); }
+  .community .sec-head p{ color:rgba(242,241,236,0.6); }
+  .filter-row{ display:flex; flex-wrap:wrap; gap:10px; margin-bottom:34px; }
+  .chip{
+    font-family:'JetBrains Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.05em;
+    border:1.5px solid rgba(242,241,236,0.3); padding:8px 16px; color:rgba(242,241,236,0.75);
+  }
+  .chip.active{ background:var(--red); border-color:var(--red); color:var(--ink); font-weight:700; }
+
+  .collective-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:70px; }
+  .collective-card{
+    border:1.5px solid rgba(242,241,236,0.22); padding:20px; display:flex; flex-direction:column; gap:14px;
+    transition:border-color .2s;
+  }
+  .collective-card:hover{ border-color:var(--red); }
+  .collective-avatar{ width:100%; aspect-ratio:1; background:linear-gradient(145deg,#2a2a2a,#0a0a0a); position:relative; overflow:hidden; }
+  .collective-avatar::before{ content:''; position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent 0 8px, rgba(229,52,42,0.18) 8px 9px); }
+  .collective-avatar span{ position:absolute; bottom:10px; left:10px; font-family:'Archivo Black',sans-serif; font-size:22px; color:var(--paper); }
+  .collective-card h4{ font-size:16px; font-family:'Archivo Black',sans-serif; text-transform:uppercase; }
+  .collective-card .city{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--red); text-transform:uppercase; }
+  .collective-card .desc{ font-size:12.5px; color:rgba(242,241,236,0.55); line-height:1.5; }
+
+  .event-panel{ display:grid; grid-template-columns:0.9fr 1.6fr; gap:0; border:1.5px solid rgba(242,241,236,0.22); }
+  .event-filters{ padding:30px; border-right:1.5px solid rgba(242,241,236,0.22); }
+  .event-filters h4{ font-family:'JetBrains Mono',monospace; font-size:12px; text-transform:uppercase; letter-spacing:0.08em; color:var(--red); margin-bottom:18px; }
+  .event-filters label{ display:block; font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase; letter-spacing:0.06em; color:rgba(242,241,236,0.5); margin:16px 0 6px; }
+  .event-filters select, .event-filters input{
+    width:100%; background:transparent; border:1.5px solid rgba(242,241,236,0.3); color:var(--paper);
+    padding:9px 10px; font-family:'JetBrains Mono',monospace; font-size:12.5px;
+  }
+  .event-list{ padding:10px 0; }
+  .event-row{
+    display:grid; grid-template-columns:74px 1fr auto; align-items:center; gap:18px;
+    padding:18px 30px; border-bottom:1px solid rgba(242,241,236,0.14);
+  }
+  .event-row:last-child{ border-bottom:none; }
+  .event-date{ text-align:center; border-right:1.5px solid rgba(242,241,236,0.22); padding-right:16px; }
+  .event-date .d{ font-family:'Archivo Black',sans-serif; font-size:26px; line-height:1; }
+  .event-date .m{ font-family:'JetBrains Mono',monospace; font-size:10.5px; color:var(--red); text-transform:uppercase; }
+  .event-info h5{ font-size:15.5px; font-family:'Archivo Black',sans-serif; text-transform:uppercase; margin-bottom:4px; }
+  .event-info span{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:rgba(242,241,236,0.55); }
+  .event-badge{ font-family:'JetBrains Mono',monospace; font-size:10.5px; text-transform:uppercase; border:1px solid var(--red); color:var(--red); padding:5px 10px; white-space:nowrap; }
+
+  /* ---------- KERJASAMA / RATE CARD ---------- */
+  .partnership{ display:grid; grid-template-columns:1fr 1fr; gap:0; border:2px solid var(--ink); }
+  .partnership-info{ padding:44px; }
+  .partnership-info h2{ font-size:clamp(28px,3.6vw,42px); margin-bottom:16px; }
+  .partnership-info p{ color:var(--grey); font-size:14.5px; line-height:1.6; max-width:440px; margin-bottom:30px; }
+  .rate-list{ display:flex; flex-direction:column; }
+  .rate-row{ display:flex; justify-content:space-between; align-items:center; padding:16px 0; border-bottom:1px dashed var(--grey-line); }
+  .rate-row:first-child{ border-top:1px dashed var(--grey-line); }
+  .rate-row b{ font-size:14.5px; font-family:'Work Sans',sans-serif; }
+  .rate-row span{ font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--grey); text-transform:uppercase; }
+  .partnership-cta{ background:var(--ink); color:var(--paper); padding:44px; display:flex; flex-direction:column; justify-content:space-between; }
+  .partnership-cta h3{ font-family:'Archivo Black',sans-serif; font-size:24px; text-transform:uppercase; margin-bottom:12px; }
+  .partnership-cta p{ color:rgba(242,241,236,0.65); font-size:14px; line-height:1.6; margin-bottom:26px; }
+  .wa-btn{
+    display:flex; align-items:center; justify-content:center; gap:10px; background:var(--red); color:var(--ink);
+    padding:16px; font-family:'JetBrains Mono',monospace; font-weight:700; text-transform:uppercase; font-size:13px;
+    letter-spacing:0.06em; clip-path:polygon(0 0,100% 0,100% 72%,90% 100%,0 100%);
+  }
+  .wa-btn:hover{ background:var(--paper); }
+  .form-mini{ margin-top:18px; display:flex; flex-direction:column; gap:10px; }
+  .form-mini input{ background:transparent; border:1.5px solid rgba(242,241,236,0.3); color:var(--paper); padding:11px 12px; font-family:'JetBrains Mono',monospace; font-size:12.5px; }
+  .form-mini input::placeholder{ color:rgba(242,241,236,0.4); }
+
+  /* ---------- SHARE section (icon shape referencing the control-center screenshot) ---------- */
+  .share-demo{ display:flex; align-items:center; gap:60px; flex-wrap:wrap; }
+  .share-article{ flex:1; min-width:260px; }
+  .share-article h3{ font-size:24px; margin-bottom:10px; }
+  .share-article p{ color:var(--grey); font-size:14px; line-height:1.6; max-width:380px; }
+  .share-buttons{ display:flex; gap:16px; }
+  .share-btn{
+    width:64px; height:64px; position:relative; background:var(--ink); display:flex; align-items:center; justify-content:center;
+    clip-path:polygon(18% 0,100% 0,100% 82%,82% 100%,0 100%,0 18%);
+    transition:transform .15s ease;
+  }
+  .share-btn:hover{ transform:translateY(-4px); }
+  .share-btn svg{ width:26px; height:26px; }
+  .share-btn.ig{ background:radial-gradient(circle at 30% 110%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%); }
+  .share-btn.tiktok{ background:#000; }
+  .share-btn.x{ background:#000; }
+  .share-btn.wa{ background:#20BD5C; }
+  .share-btn.wa svg, .share-btn.x svg, .share-btn.tiktok svg, .share-btn.ig svg{ fill:#fff; }
+
+  /* ---------- FOOTER ---------- */
+  footer{ background:var(--ink); color:rgba(242,241,236,0.5); padding:54px 0 24px; }
+  .footer-top{ display:grid; grid-template-columns:1.3fr 1fr 1fr 1fr; gap:36px; padding-bottom:40px; border-bottom:1px solid rgba(242,241,236,0.14); }
+  footer .mark-word{ color:var(--paper); }
+  footer p.about{ font-size:13px; line-height:1.6; margin-top:14px; max-width:260px; }
+  footer h5{ font-family:'JetBrains Mono',monospace; font-size:11.5px; text-transform:uppercase; letter-spacing:0.08em; color:var(--paper); margin-bottom:14px; }
+  footer ul{ list-style:none; display:flex; flex-direction:column; gap:9px; }
+  footer ul a{ font-size:13.5px; }
+  footer ul a:hover{ color:var(--red); }
+  .footer-bottom{ display:flex; justify-content:space-between; padding-top:20px; font-family:'JetBrains Mono',monospace; font-size:11px; text-transform:uppercase; letter-spacing:0.05em; flex-wrap:wrap; gap:10px; }
+
+  @media (max-width:980px){
+    nav.primary{ display:none; }
+    .hero-grid{ grid-template-columns:1fr; }
+    .music-cols{ grid-template-columns:1fr; }
+    .article-demo{ grid-template-columns:1fr; }
+    .article-demo .col-a{ border-right:none; border-bottom:2px solid var(--ink); }
+    .lifestyle-grid{ grid-template-columns:1fr; }
+    .feature-editorial{ grid-template-columns:1fr; }
+    .collective-grid{ grid-template-columns:repeat(2,1fr); }
+    .event-panel{ grid-template-columns:1fr; }
+    .event-filters{ border-right:none; border-bottom:1.5px solid rgba(242,241,236,0.22); }
+    .partnership{ grid-template-columns:1fr; }
+    .footer-top{ grid-template-columns:1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="site">
+  <div class="wrap">
+    <a href="#top" class="mark">
+      <svg width="34" height="34" viewBox="0 0 100 100" fill="none">
+        <rect x="6" y="6" width="88" height="88" fill="none" stroke="#f2f1ec" stroke-width="7"/>
+        <g stroke="#f2f1ec" stroke-width="9">
+          <path d="M22 20 L22 80"/>
+          <path d="M37 20 L28 80"/>
+          <path d="M52 20 L52 80"/>
+          <path d="M67 32 L58 80"/>
+          <path d="M78 44 L78 80"/>
+        </g>
+      </svg>
+      <span class="mark-word">music<span class="dot">.</span>do<span class="dot">.</span>id</span>
+    </a>
+    <nav class="primary">
+      <a href="#musik">Musik</a>
+      <a href="#lifestyle">Lifestyle</a>
+      <a href="#fitur">Fitur</a>
+      <a href="#community">Community Hub</a>
+      <a href="#kerjasama">Kerja Sama</a>
+    </nav>
+    <a href="#kerjasama" class="btn-cta">Kerja Sama →</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<div id="top" class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow">Media Musik &amp; Budaya Jalanan Indonesia</div>
+        <h1 class="display">Dengar<br>Lihat<br><span class="hl">Rayakan.</span></h1>
+        <p class="lede">Dari bar terakhir sebuah verse sampai pembukaan tembok mural — music.do.id merekam denyut hip-hop, R&amp;B, dan budaya jalanan dari kota ke kota.</p>
+      </div>
+      <div class="hero-side">
+        <div class="stat"><span>Rilisan diulas bulan ini</span><b>128</b></div>
+        <div class="stat"><span>Kolektif terdaftar</span><b>340+</b></div>
+        <div class="stat"><span>Kota terpantau</span><b>19</b></div>
+      </div>
+    </div>
+  </div>
+  <div class="ticker">
+    <div class="ticker-track">
+      <span>★ RELEASE RADAR — "Malam Bising" masuk playlist minggu ini</span>
+      <span>★ AGENDA — Rap Battle Terminal, Bandung, 12 Juli</span>
+      <span>★ REVIEW BARU — EP "Beton &amp; Bara" ditinjau redaksi</span>
+      <span>★ KOLEKTIF BARU — Sudut Senja Records bergabung dari Jogja</span>
+      <span>★ RELEASE RADAR — "Malam Bising" masuk playlist minggu ini</span>
+      <span>★ AGENDA — Rap Battle Terminal, Bandung, 12 Juli</span>
+      <span>★ REVIEW BARU — EP "Beton &amp; Bara" ditinjau redaksi</span>
+      <span>★ KOLEKTIF BARU — Sudut Senja Records bergabung dari Jogja</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MUSIC ============ -->
+<section id="musik">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Fitur Utama</div>
+        <h2 class="display">Musik</h2>
+      </div>
+      <p>Tiga pintu masuk ke setiap rilisan: apa yang bagus, apa yang baru, dan apa artinya.</p>
+    </div>
+
+    <div class="music-cols">
+      <div class="music-col">
+        <span class="num mono">01</span>
+        <h3>Review</h3>
+        <p>Ulasan mendalam album dan EP dari redaksi — rating jujur, konteks produksi, dan posisinya di scene saat ini.</p>
+        <span class="go">Baca ulasan →</span>
+      </div>
+      <div class="music-col">
+        <span class="num mono">02</span>
+        <h3>Release Radar</h3>
+        <p>Rilisan minggu ini dikurasi tiap Jumat — single, EP, dan mixtape yang wajib masuk playlist kamu.</p>
+        <span class="go">Lihat radar →</span>
+      </div>
+      <div class="music-col">
+        <span class="num mono">03</span>
+        <h3>Lirik &amp; Makna</h3>
+        <p>Bedah bar demi bar — referensi, metafora, dan cerita di balik lirik dari rapper dan penulis lagu lokal.</p>
+        <span class="go">Bedah lirik →</span>
+      </div>
+    </div>
+
+    <!-- Article + embed demo -->
+    <div class="article-demo">
+      <div class="col-a">
+        <div class="byline mono">Review · 2 Juli 2026 · oleh Redaksi</div>
+        <h4>"Beton &amp; Bara" — Suara Baru dari Pinggiran Kota</h4>
+        <p class="body-text">EP terbaru ini membawa produksi lo-fi yang mentah dan lirik yang berbicara langsung soal hidup di pinggiran ibu kota. Setiap track terasa seperti catatan harian yang direkam di kamar sempit — jujur, tanpa polesan berlebih.</p>
+        <p class="body-text">Bagian paling kuat ada di pertengahan EP, ketika beat melambat dan ruang diberikan sepenuhnya pada penceritaan.</p>
+      </div>
+      <div class="col-b">
+        <span class="embed-label">Dengarkan &amp; tonton — penyematan otomatis</span>
+        <div class="embed-box">
+          <div class="embed-icon ic-spotify">S</div>
+          <div class="embed-meta"><b>Beton &amp; Bara — EP</b><span>Spotify · Terhubung otomatis</span></div>
+        </div>
+        <div class="embed-box">
+          <div class="embed-icon ic-apple">A</div>
+          <div class="embed-meta"><b>Beton &amp; Bara — EP</b><span>Apple Music · Terhubung otomatis</span></div>
+        </div>
+        <div class="embed-box">
+          <div class="embed-icon ic-yt">▶</div>
+          <div class="embed-meta"><b>Video Musik "Malam Bising"</b><span>YouTube · Terhubung otomatis</span></div>
+        </div>
+        <div class="embed-box">
+          <div class="embed-icon ic-tiktok">♪</div>
+          <div class="embed-meta"><b>Behind the scenes rekaman</b><span>TikTok · Terhubung otomatis</span></div>
+        </div>
+        <div class="embed-box">
+          <div class="embed-icon ic-ig">◎</div>
+          <div class="embed-meta"><b>Reel peluncuran EP</b><span>Instagram · Terhubung otomatis</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LIFESTYLE ============ -->
+<section id="lifestyle">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Fitur Utama</div>
+        <h2 class="display">Lifestyle</h2>
+      </div>
+      <p>Budaya di luar studio — apa yang dipakai, apa yang digambar di tembok, dan bagaimana tubuh bergerak.</p>
+    </div>
+    <div class="lifestyle-grid">
+      <div class="life-card life-1">
+        <div class="tag mono">Streetwear / Fashion</div>
+        <h3>Gaya Lokal, Standar Global</h3>
+        <p>Sorotan drop terbaru brand lokal dan gaya jalanan dari gigs ke gigs.</p>
+      </div>
+      <div class="life-card life-2">
+        <div class="tag mono">Graffiti / Mural</div>
+        <h3>Tembok Bicara</h3>
+        <p>Dokumentasi mural dan aksi graffiti dari sudut-sudut kota.</p>
+      </div>
+      <div class="life-card life-3">
+        <div class="tag mono">Dance</div>
+        <h3>Gerak Jalanan</h3>
+        <p>Liputan cypher, battle breaking, dan komunitas dance urban.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section id="fitur">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Fitur Utama</div>
+        <h2 class="display">Features</h2>
+      </div>
+      <p>Wawancara eksklusif dan editorial panjang di luar rutinitas rilisan mingguan.</p>
+    </div>
+    <div class="feature-editorial">
+      <div class="feature-visual"></div>
+      <div>
+        <p class="feature-quote">"Saya nggak nulis buat trending. <span class="red">Saya nulis biar 10 tahun lagi masih relevan.</span>"</p>
+        <p style="color:var(--grey);font-size:14px;line-height:1.6;max-width:480px;">Wawancara eksklusif bersama produser dan penulis lagu yang sudah 12 tahun membentuk suara scene bawah tanah — soal proses, kegagalan, dan alasan tetap independen.</p>
+        <div class="feature-meta">
+          <div class="feature-avatar"></div>
+          <div>
+            <b>Eksklusif Interview</b>
+            <span>Editorial · 8 menit baca</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMMUNITY HUB ============ -->
+<section id="community" class="community">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Community Hub</div>
+        <h2 class="display">Peta Hip-Hop Nusantara</h2>
+      </div>
+      <p>Direktori kolektif dan kalender acara — temukan siapa dan apa yang sedang bergerak di kotamu.</p>
+    </div>
+
+    <!-- Direktori Kolektif -->
+    <div class="filter-row">
+      <div class="chip active">Semua Kota</div>
+      <div class="chip">Jakarta</div>
+      <div class="chip">Bandung</div>
+      <div class="chip">Jogja</div>
+      <div class="chip">Surabaya</div>
+      <div class="chip">Medan</div>
+      <div class="chip">Makassar</div>
+    </div>
+
+    <div class="collective-grid">
+      <div class="collective-card">
+        <div class="collective-avatar"><span>SK</span></div>
+        <h4>Sudut Kota Records</h4>
+        <div class="city mono">Jakarta</div>
+        <p class="desc">Label independen fokus rap naratif dan produksi lo-fi.</p>
+      </div>
+      <div class="collective-card">
+        <div class="collective-avatar"><span>TR</span></div>
+        <h4>Terminal Rhymes</h4>
+        <div class="city mono">Bandung</div>
+        <p class="desc">Kolektif penyelenggara rap battle dan open mic bulanan.</p>
+      </div>
+      <div class="collective-card">
+        <div class="collective-avatar"><span>SS</span></div>
+        <h4>Sudut Senja Records</h4>
+        <div class="city mono">Jogja</div>
+        <p class="desc">Rumah produksi untuk musisi R&amp;B dan neo soul lokal.</p>
+      </div>
+      <div class="collective-card">
+        <div class="collective-avatar"><span>PB</span></div>
+        <h4>Pesisir Beatmakers</h4>
+        <div class="city mono">Surabaya</div>
+        <p class="desc">Kumpulan produser beat trap dan boom bap generasi baru.</p>
+      </div>
+    </div>
+
+    <!-- Event Calendar -->
+    <div class="sec-head" style="margin-bottom:24px;">
+      <div>
+        <div class="eyebrow">Kalender Acara</div>
+        <h2 class="display" style="font-size:clamp(24px,3vw,34px);">Agenda Minggu Ini</h2>
+      </div>
+    </div>
+
+    <div class="event-panel">
+      <div class="event-filters">
+        <h4>Saring Agenda</h4>
+        <label>Kota</label>
+        <select><option>Semua Kota</option><option>Jakarta</option><option>Bandung</option><option>Jogja</option></select>
+        <label>Tanggal</label>
+        <input type="date">
+        <label>Jenis Acara</label>
+        <select><option>Semua Jenis</option><option>Gigs</option><option>Rap Battle</option><option>Festival</option><option>Street Event</option></select>
+      </div>
+      <div class="event-list">
+        <div class="event-row">
+          <div class="event-date"><div class="d">12</div><div class="m">Jul</div></div>
+          <div class="event-info"><h5>Rap Battle Terminal</h5><span>Terminal Rhymes · Bandung</span></div>
+          <div class="event-badge">Rap Battle</div>
+        </div>
+        <div class="event-row">
+          <div class="event-date"><div class="d">15</div><div class="m">Jul</div></div>
+          <div class="event-info"><h5>Malam Cypher Sudut Kota</h5><span>Sudut Kota Records · Jakarta</span></div>
+          <div class="event-badge">Gigs</div>
+        </div>
+        <div class="event-row">
+          <div class="event-date"><div class="d">21</div><div class="m">Jul</div></div>
+          <div class="event-info"><h5>Festival Mural Tembok Cerita</h5><span>Kolektif Bebas Dinding · Jogja</span></div>
+          <div class="event-badge">Street Event</div>
+        </div>
+        <div class="event-row">
+          <div class="event-date"><div class="d">27</div><div class="m">Jul</div></div>
+          <div class="event-info"><h5>Beatmaker Showcase</h5><span>Pesisir Beatmakers · Surabaya</span></div>
+          <div class="event-badge">Festival</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SOCIAL SHARE ============ -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Fitur Media Sosial</div>
+        <h2 class="display" style="font-size:clamp(26px,3.4vw,38px);">Berbagi Cepat</h2>
+      </div>
+    </div>
+    <div class="share-demo">
+      <div class="share-article">
+        <h3>Setiap artikel siap dibagikan dalam satu ketuk</h3>
+        <p>Tombol berbagi dipotong diagonal — mengikuti bentuk ikon pada kontrol cepat — dioptimalkan untuk Instagram Stories, TikTok, X (Twitter), dan WhatsApp.</p>
+      </div>
+      <div class="share-buttons">
+        <div class="share-btn ig"><svg viewBox="0 0 24 24"><path d="M12 2.2c3.2 0 3.58.01 4.85.07 1.17.05 1.97.24 2.43.4a4.9 4.9 0 0 1 1.77 1.15 4.9 4.9 0 0 1 1.15 1.77c.16.46.35 1.26.4 2.43.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.24 1.97-.4 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.46.16-1.26.35-2.43.4-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.97-.24-2.43-.4a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.16-.46-.35-1.26-.4-2.43C2.21 15.58 2.2 15.2 2.2 12s.01-3.58.07-4.85c.05-1.17.24-1.97.4-2.43a4.9 4.9 0 0 1 1.15-1.77A4.9 4.9 0 0 1 5.6 1.8c.46-.16 1.26-.35 2.43-.4C9.3 1.34 9.68 1.33 12 1.33m0 1.8c-3.16 0-3.5.01-4.74.07-.96.04-1.48.2-1.82.34-.46.18-.79.4-1.13.74-.34.34-.56.67-.74 1.13-.14.34-.3.86-.34 1.82-.06 1.24-.07 1.58-.07 4.74s.01 3.5.07 4.74c.04.96.2 1.48.34 1.82.18.46.4.79.74 1.13.34.34.67.56 1.13.74.34.14.86.3 1.82.34 1.24.06 1.58.07 4.74.07s3.5-.01 4.74-.07c.96-.04 1.48-.2 1.82-.34.46-.18.79-.4 1.13-.74.34-.34.56-.67.74-1.13.14-.34.3-.86.34-1.82.06-1.24.07-1.58.07-4.74s-.01-3.5-.07-4.74c-.04-.96-.2-1.48-.34-1.82a3.1 3.1 0 0 0-.74-1.13 3.1 3.1 0 0 0-1.13-.74c-.34-.14-.86-.3-1.82-.34-1.24-.06-1.58-.07-4.74-.07M12 6.87A5.13 5.13 0 1 1 6.87 12 5.13 5.13 0 0 1 12 6.87m0 1.8A3.33 3.33 0 1 0 15.33 12 3.33 3.33 0 0 0 12 8.67m5.34-3.4a1.2 1.2 0 1 1-1.2-1.2 1.2 1.2 0 0 1 1.2 1.2"/></svg></div>
+        <div class="share-btn tiktok"><svg viewBox="0 0 24 24"><path d="M16.6 5.82c-.9-.86-1.44-2.05-1.44-3.36h-3.28v13.66a2.7 2.7 0 1 1-2.06-2.62v-3.32a6 6 0 1 0 5.34 5.94V9.28a6.7 6.7 0 0 0 3.9 1.25V7.24a3.4 3.4 0 0 1-2.46-1.42"/></svg></div>
+        <div class="share-btn x"><svg viewBox="0 0 24 24"><path d="M18.24 3H21l-6.55 7.49L22.2 21h-6.4l-5-6.53L4.98 21H2.2l7.01-8.02L2 3h6.55l4.52 5.97L18.24 3zm-1.12 16.17h1.77L7 4.73H5.1l12.02 14.44z"/></svg></div>
+        <div class="share-btn wa"><svg viewBox="0 0 24 24"><path d="M12.01 2C6.5 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.17-1.31A9.96 9.96 0 0 0 12.01 22C17.52 22 22 17.52 22 12S17.52 2 12.01 2m0 18.13c-1.63 0-3.15-.47-4.44-1.28l-.32-.19-3.1.79.83-3.02-.21-.32a8.07 8.07 0 0 1-1.27-4.11c0-4.48 3.65-8.13 8.14-8.13 4.48 0 8.13 3.65 8.13 8.13 0 4.49-3.65 8.13-8.16 8.13m4.5-6.1c-.25-.12-1.46-.72-1.68-.8-.23-.08-.39-.12-.56.12-.16.25-.64.8-.79.96-.14.16-.29.18-.54.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.23-1.46-1.37-1.71-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.16-.25.25-.41.08-.16.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.43h-.48c-.16 0-.43.06-.66.31s-.87.85-.87 2.08.89 2.41 1.02 2.58c.12.16 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.46-.6 1.66-1.17.21-.58.21-1.08.14-1.18-.06-.11-.23-.17-.48-.29"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ KERJASAMA ============ -->
+<section id="kerjasama">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow">Fitur Komersial</div>
+        <h2 class="display">Kerja Sama Media</h2>
+      </div>
+      <p>Pasang iklan, promosikan rilisan, atau titip konten ke pembaca yang tepat.</p>
+    </div>
+
+    <div class="partnership">
+      <div class="partnership-info">
+        <h2 class="display" style="font-size:28px;">Rate Card</h2>
+        <p>Layanan media untuk label, brand streetwear, dan penyelenggara acara yang ingin menjangkau komunitas hip-hop di seluruh Indonesia.</p>
+        <div class="rate-list">
+          <div class="rate-row"><b>Banner Homepage — 1 Minggu</b><span>Rp 3.500.000</span></div>
+          <div class="rate-row"><b>Content Placement Artikel</b><span>Rp 2.000.000</span></div>
+          <div class="rate-row"><b>Promosi Rilisan (Release Radar)</b><span>Rp 1.200.000</span></div>
+          <div class="rate-row"><b>Paket Editorial + Interview</b><span>Rp 4.800.000</span></div>
+        </div>
+      </div>
+      <div class="partnership-cta">
+        <div>
+          <h3>Diskusikan Kerja Sama</h3>
+          <p>Tim media kami balas dalam 1x24 jam kerja. Ceritakan brand atau rilisan kamu, kami bantu carikan format yang pas.</p>
+          <div class="form-mini">
+            <input type="text" placeholder="Nama Brand / Label">
+            <input type="text" placeholder="Kebutuhan kerja sama">
+          </div>
+        </div>
+        <a href="#" class="wa-btn" style="margin-top:24px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.01 2C6.5 2 2 6.48 2 12c0 1.82.49 3.53 1.34 5L2 22l5.17-1.31A9.96 9.96 0 0 0 12.01 22C17.52 22 22 17.52 22 12S17.52 2 12.01 2"/></svg>
+          Hubungi via WhatsApp Bisnis
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-top">
+      <div>
+        <div class="mark">
+          <svg width="30" height="30" viewBox="0 0 100 100" fill="none">
+            <rect x="6" y="6" width="88" height="88" fill="none" stroke="#f2f1ec" stroke-width="7"/>
+            <g stroke="#f2f1ec" stroke-width="9">
+              <path d="M22 20 L22 80"/><path d="M37 20 L28 80"/><path d="M52 20 L52 80"/>
+              <path d="M67 32 L58 80"/><path d="M78 44 L78 80"/>
+            </g>
+          </svg>
+          <span class="mark-word">music.do.id</span>
+        </div>
+        <p class="about">Media independen untuk musik dan budaya jalanan Indonesia — dari review, radar rilisan, sampai peta kolektif kota.</p>
+      </div>
+      <div>
+        <h5>Jelajah</h5>
+        <ul><li><a href="#musik">Musik</a></li><li><a href="#lifestyle">Lifestyle</a></li><li><a href="#fitur">Features</a></li></ul>
+      </div>
+      <div>
+        <h5>Komunitas</h5>
+        <ul><li><a href="#community">Direktori Kolektif</a></li><li><a href="#community">Kalender Acara</a></li></ul>
+      </div>
+      <div>
+        <h5>Bisnis</h5>
+        <ul><li><a href="#kerjasama">Kerja Sama Media</a></li><li><a href="#kerjasama">Rate Card</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 music.do.id — Semua hak dilindungi</span>
+      <span>Dibuat untuk suara jalanan Indonesia</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
