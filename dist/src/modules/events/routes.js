@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const prisma_1 = require("../../shared/prisma");
 const authMiddleware_1 = require("../../shared/authMiddleware");
+const upload_1 = require("../../utils/upload");
 const router = (0, express_1.Router)();
 // GET /api/events — list all events (only ACTIVE/PUBLISHED events for public)
 router.get('/', async (req, res) => {
@@ -45,7 +46,7 @@ router.get('/me', authMiddleware_1.requireAuth, async (req, res) => {
     }
 });
 // POST /api/events — create event
-router.post('/', authMiddleware_1.requireAuth, async (req, res) => {
+router.post('/', authMiddleware_1.requireAuth, upload_1.upload.single('poster'), async (req, res) => {
     try {
         const { title, name, slug, category, event_date, city, location, venue, image_url } = req.body;
         const eventName = title || name;
@@ -57,6 +58,10 @@ router.post('/', authMiddleware_1.requireAuth, async (req, res) => {
         if (existing) {
             return res.status(409).json({ message: 'Event with this slug already exists' });
         }
+        let finalImageUrl = image_url || null;
+        if (req.file) {
+            finalImageUrl = `/public/uploads/images/${req.file.filename}`;
+        }
         const event = await prisma_1.prisma.event.create({
             data: {
                 name: eventName,
@@ -65,7 +70,7 @@ router.post('/', authMiddleware_1.requireAuth, async (req, res) => {
                 event_date: event_date ? new Date(event_date) : null,
                 city,
                 venue: eventVenue || null,
-                image_url: image_url || null,
+                image_url: finalImageUrl,
                 user_id: req.user.sub,
                 status: 'PUBLISHED' // automatically active when posted by musician
             }
@@ -120,9 +125,8 @@ router.delete('/:id', authMiddleware_1.requireAuth, async (req, res) => {
         if (existing.user_id !== req.user.sub) {
             return res.status(403).json({ message: 'Forbidden: You do not own this event' });
         }
-        await prisma_1.prisma.event.update({
-            where: { id: req.params.id },
-            data: { deleted_at: new Date() }
+        await prisma_1.prisma.event.delete({
+            where: { id: req.params.id }
         });
         res.json({ message: 'Event deleted successfully' });
     }

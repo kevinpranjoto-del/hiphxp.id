@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const prisma_1 = require("../../shared/prisma");
+const authMiddleware_1 = require("../../shared/authMiddleware");
 const router = (0, express_1.Router)();
 router.get('/articles', async (_req, res) => {
     try {
@@ -34,7 +35,7 @@ router.get('/articles/:slug', async (req, res) => {
         return res.status(500).json({ message: 'Failed to fetch article' });
     }
 });
-router.post('/articles', async (req, res) => {
+router.post('/articles', authMiddleware_1.requireAuth, async (req, res) => {
     try {
         const article = await prisma_1.prisma.article.create({ data: req.body });
         res.status(201).json(article);

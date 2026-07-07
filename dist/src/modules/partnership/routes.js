@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const zod_1 = require("zod");
 const prisma_1 = require("../../shared/prisma");
+const authMiddleware_1 = require("../../shared/authMiddleware");
 const router = (0, express_1.Router)();
 const createPartnershipSchema = zod_1.z.object({
     name: zod_1.z.string().min(1),
@@ -67,7 +68,7 @@ router.post('/', async (req, res) => {
         res.status(500).json({ message: 'Failed to create partnership request' });
     }
 });
-router.patch('/:id', async (req, res) => {
+router.patch('/:id', authMiddleware_1.requireAuth, async (req, res) => {
     try {
         const parsed = updatePartnershipSchema.safeParse(req.body);
         if (!parsed.success) {
@@ -90,7 +91,7 @@ router.patch('/:id', async (req, res) => {
         res.status(500).json({ message: 'Failed to update partnership request' });
     }
 });
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', authMiddleware_1.requireAuth, async (req, res) => {
     try {
         const partnership = await prisma_1.prisma.partnership.updateMany({
             where: { id: req.params.id, deleted_at: null },

@@ -27,12 +27,14 @@ const lifestyle_routes_1 = __importDefault(require("./modules/content/lifestyle.
 const editorial_routes_1 = __importDefault(require("./modules/content/editorial.routes"));
 const reviews_routes_1 = __importDefault(require("./modules/content/reviews.routes"));
 const app = (0, express_1.default)();
-const uploadDir = path_1.default.join(__dirname, '../public/uploads');
+const uploadDir = path_1.default.join(process.cwd(), 'public/uploads');
 if (!fs_1.default.existsSync(uploadDir)) {
     fs_1.default.mkdirSync(path_1.default.join(uploadDir, 'audio'), { recursive: true });
     fs_1.default.mkdirSync(path_1.default.join(uploadDir, 'images'), { recursive: true });
 }
-app.use((0, helmet_1.default)());
+app.use((0, helmet_1.default)({
+    crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 app.use((0, cors_1.default)({ origin: env_1.env.corsOrigin, credentials: true }));
 app.use((0, compression_1.default)());
 app.use((0, cookie_parser_1.default)());
@@ -40,7 +42,8 @@ app.use(express_1.default.json({ limit: '1mb' }));
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, morgan_1.default)('dev'));
 app.use((0, express_rate_limit_1.default)({ windowMs: env_1.env.rateLimitWindowMs, max: env_1.env.rateLimitMax }));
-app.use('/public', express_1.default.static(path_1.default.join(__dirname, '../public')));
+app.use('/public', express_1.default.static(path_1.default.join(process.cwd(), 'public')));
+app.use(express_1.default.static(path_1.default.join(process.cwd(), 'frontend'))); // Serve static frontend files
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/maintenance', (_req, res) => res.status(200).json({
     message: 'Maintenance / Coming Soon',
