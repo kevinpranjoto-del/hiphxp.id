@@ -7,7 +7,7 @@
  */
 
 const IS_LOCAL = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
-export const API_BASE_URL = IS_LOCAL ? 'http://localhost:4000' : 'https://hiphxp.mooo.com';
+export const API_BASE_URL = ''; // Gunakan relative path untuk Unified Deployment (Backend + Frontend satu server)
 
 export function resolveUrl(url) {
   if (!url) return '';
