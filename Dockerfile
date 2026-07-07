@@ -20,4 +20,4 @@ COPY --from=builder /app/public ./public
 COPY prisma ./prisma
 ENV NODE_ENV=production
 EXPOSE 4000
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/src/server.js"]
+CMD ["sh", "-c", "npx prisma db push --accept-data-loss && node dist/src/server.js"]
