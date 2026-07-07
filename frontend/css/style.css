@@ -959,17 +959,15 @@ body.theme-dark {
     padding-bottom: 8px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
+    align-items: center;
   }
   .dash-nav::-webkit-scrollbar { display: none; }
-  .dash-tab {
+  .dash-tab, .dash-nav button.logout {
     flex-shrink: 0;
     white-space: nowrap;
     font-size: 12px;
     padding: 8px 14px;
-  }
-  .logout {
-    flex-shrink: 0;
-    white-space: nowrap;
+    margin-top: 0;
   }
 
   /* Dashboard tables — horizontal scroll */
@@ -1044,7 +1042,7 @@ body.theme-dark {
 /* Music Page — song card grid on mobile */
 @media (max-width: 600px) {
   .music-page {
-    padding-top: 70px;
+    padding-top: 100px;
     padding-left: 12px;
     padding-right: 12px;
   }
@@ -1069,7 +1067,7 @@ body.theme-dark {
 
 /* General — prevent content overflow */
 @media (max-width: 600px) {
-  .wrap { padding: 0 14px; }
+  .wrap { padding-left: 14px; padding-right: 14px; }
   img { max-width: 100%; height: auto; }
   table { font-size: 13px; }
 }

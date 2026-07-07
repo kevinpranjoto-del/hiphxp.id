@@ -314,24 +314,27 @@ window.initDashboard = function() {
   }
   
   
-  // Submit Event
+    // Submit Event
   const formEvent = document.getElementById('form-event');
   if (formEvent) {
     formEvent.addEventListener('submit', async (e) => {
       e.preventDefault();
       
-      const payload = {
-        title: document.getElementById('event-title').value,
-        slug: document.getElementById('event-title').value.toLowerCase().replace(/ /g, '-'),
-        category: document.getElementById('event-category').value,
-        event_date: document.getElementById('event-date').value,
-        city: document.getElementById('event-city').value,
-        location: document.getElementById('event-location').value,
-        image_url: document.getElementById('event-poster').value,
-      };
+      const formData = new FormData();
+      formData.append('title', document.getElementById('event-title').value);
+      formData.append('slug', document.getElementById('event-title').value.toLowerCase().replace(/ /g, '-'));
+      formData.append('category', document.getElementById('event-category').value);
+      formData.append('event_date', document.getElementById('event-date').value);
+      formData.append('city', document.getElementById('event-city').value);
+      formData.append('location', document.getElementById('event-location').value);
+      
+      const posterInput = document.getElementById('event-poster');
+      if (posterInput.files[0]) {
+        formData.append('poster', posterInput.files[0]);
+      }
     
       try {
-        const res = await submitEvent(payload, token);
+        const res = await submitEvent(formData, token);
         if (res.id) {
           showToast('Acara berhasil dijadwalkan!');
           e.target.reset();

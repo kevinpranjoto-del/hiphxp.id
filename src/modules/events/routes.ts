@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { prisma } from '../../shared/prisma';
 import { requireAuth } from '../../shared/authMiddleware';
+import { upload } from '../../utils/upload';
 
 const router = Router();
 
@@ -43,7 +44,7 @@ router.get('/me', requireAuth, async (req: any, res) => {
 });
 
 // POST /api/events — create event
-router.post('/', requireAuth, async (req: any, res) => {
+router.post('/', requireAuth, upload.single('poster'), async (req: any, res) => {
   try {
     const { title, name, slug, category, event_date, city, location, venue, image_url } = req.body;
 
@@ -59,6 +60,11 @@ router.post('/', requireAuth, async (req: any, res) => {
       return res.status(409).json({ message: 'Event with this slug already exists' });
     }
 
+    let finalImageUrl = image_url || null;
+    if (req.file) {
+      finalImageUrl = `/public/uploads/images/${req.file.filename}`;
+    }
+
     const event = await prisma.event.create({
       data: {
         name: eventName,
@@ -67,7 +73,7 @@ router.post('/', requireAuth, async (req: any, res) => {
         event_date: event_date ? new Date(event_date) : null,
         city,
         venue: eventVenue || null,
-        image_url: image_url || null,
+        image_url: finalImageUrl,
         user_id: req.user.sub,
         status: 'PUBLISHED' // automatically active when posted by musician
       }

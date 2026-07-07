@@ -166,12 +166,22 @@ export async function updateMyProfile(formData, token) {
 }
 
 /** POST /api/events */
-export async function submitEvent(data, token) {
-  return apiFetch('/api/events', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}` },
-    body: JSON.stringify(data)
-  });
+export async function submitEvent(formData, token) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/events`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({ message: 'Unknown error' }));
+      throw new Error(err.message || `HTTP ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.warn(`[API] /api/events failed:`, error.message);
+    throw error;
+  }
 }
 
 /** GET /api/songs/me */
