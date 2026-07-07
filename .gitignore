@@ -27,3 +27,6 @@ npm-debug.log*
 # Temporary
 *.tar
 /tmp/
+
+# Uploads
+public/uploads/
