@@ -41,6 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan('dev'));
 app.use(rateLimit({ windowMs: env.rateLimitWindowMs, max: env.rateLimitMax }));
 app.use('/public', express.static(path.join(process.cwd(), 'public')));
+app.use(express.static(path.join(process.cwd(), 'frontend'))); // Serve static frontend files
 
 app.get('/health', (_req, res) => res.json({ status: 'ok' }));
 app.get('/maintenance', (_req, res) => res.status(200).json({
