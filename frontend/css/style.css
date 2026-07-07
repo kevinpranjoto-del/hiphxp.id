@@ -939,8 +939,9 @@ body.theme-dark {
     }
     
     @media (max-width: 768px) {
-      .dash-layout { grid-template-columns: 1fr; }
-      .dash-sidebar { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+      .dash-layout { grid-template-columns: 1fr; min-width: 0; }
+      .dash-sidebar { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; padding-right: 0; min-width: 0; }
+      .dash-content { min-width: 0; }
       .form-grid { grid-template-columns: 1fr; }
     }
 
