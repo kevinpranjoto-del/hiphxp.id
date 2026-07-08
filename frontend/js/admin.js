@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   try {
     const payload = JSON.parse(atob(token.split('.')[1]));
     if (payload.role !== 'ADMIN' && payload.role !== 'SUPER_ADMIN') {
-      alert('Akses ditolak: Hanya Admin');
+      await customAlert('Akses ditolak: Hanya Admin');
       window.location.href = 'dashboard.html';
       return;
     }
@@ -70,7 +70,7 @@ async function loadAdminSongs() {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${s.title}</td>
-        <td>${s.artist?.artist_name || '-'}</td>
+        <td>${s.artist?.name || '-'}</td>
         <td>${s.release_date ? new Date(s.release_date).toLocaleDateString() : '-'}</td>
         <td>
           <button class="btn-danger btn-sm" onclick="deleteSong('${s.id}')">Hapus</button>
@@ -90,9 +90,9 @@ async function loadAdminEvents() {
     events.forEach(e => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
-        <td>${e.title}</td>
-        <td>${e.location || '-'}</td>
-        <td>${new Date(e.event_date).toLocaleDateString()}</td>
+        <td>${e.name || '-'}</td>
+        <td>${e.venue || e.city || '-'}</td>
+        <td>${e.event_date ? new Date(e.event_date).toLocaleDateString() : '-'}</td>
         <td>
           <button class="btn-danger btn-sm" onclick="deleteEvent('${e.id}')">Hapus</button>
         </td>
@@ -103,21 +103,21 @@ async function loadAdminEvents() {
 }
 
 window.deleteUser = async (id) => {
-  if(!confirm('Yakin hapus user ini?')) return;
+  if(!await customConfirm('Yakin hapus user ini?')) return;
   await apiFetch(`/api/admin/users/${id}`, { method: 'DELETE' });
   loadAdminUsers();
   loadAdminStats();
 }
 
 window.deleteSong = async (id) => {
-  if(!confirm('Yakin hapus lagu ini?')) return;
+  if(!await customConfirm('Yakin hapus lagu ini?')) return;
   await apiFetch(`/api/admin/songs/${id}`, { method: 'DELETE' });
   loadAdminSongs();
   loadAdminStats();
 }
 
 window.deleteEvent = async (id) => {
-  if(!confirm('Yakin hapus event ini?')) return;
+  if(!await customConfirm('Yakin hapus event ini?')) return;
   await apiFetch(`/api/admin/events/${id}`, { method: 'DELETE' });
   loadAdminEvents();
   loadAdminStats();
@@ -130,10 +130,10 @@ window.logout = () => {
 }
 
 window.changeUserPassword = async (id) => {
-  const newPassword = prompt('Masukkan password baru untuk user ini (min. 6 karakter):');
+  const newPassword = await customPrompt('Masukkan password baru untuk user ini (min. 6 karakter):', '', 'password');
   if (!newPassword) return;
   if (newPassword.length < 6) {
-    alert('Password minimal 6 karakter!');
+    await customAlert('Password minimal 6 karakter!');
     return;
   }
   
@@ -143,9 +143,9 @@ window.changeUserPassword = async (id) => {
       body: JSON.stringify({ newPassword })
     });
     if (res.success) {
-      alert('Password berhasil diubah!');
+      await customAlert('Password berhasil diubah!');
     }
   } catch (err) {
-    alert('Gagal mengubah password.');
+    await customAlert('Gagal mengubah password.');
   }
 }

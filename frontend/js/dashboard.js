@@ -102,21 +102,21 @@ window.initDashboard = function() {
             showToast('Status lagu berhasil diperbarui!');
             loadMySongs();
           } catch (err) {
-            alert('Gagal mengubah status: ' + err.message);
+            await customAlert('Gagal mengubah status: ' + err.message);
           }
         });
       });
       
       container.querySelectorAll('.delete-song').forEach(btn => {
         btn.addEventListener('click', async () => {
-          if (!confirm('Apakah Anda yakin ingin menghapus lagu ini secara permanen?')) return;
+          if (!await customConfirm('Apakah Anda yakin ingin menghapus lagu ini secara permanen?')) return;
           const id = btn.dataset.id;
           try {
             await deleteSong(id, token);
             showToast('Lagu berhasil dihapus!');
             loadMySongs();
           } catch (err) {
-            alert('Gagal menghapus lagu: ' + err.message);
+            await customAlert('Gagal menghapus lagu: ' + err.message);
           }
         });
       });
@@ -178,21 +178,21 @@ window.initDashboard = function() {
             showToast('Status event berhasil diperbarui!');
             loadMyEvents();
           } catch (err) {
-            alert('Gagal mengubah status event: ' + err.message);
+            await customAlert('Gagal mengubah status event: ' + err.message);
           }
         });
       });
       
       container.querySelectorAll('.delete-event').forEach(btn => {
         btn.addEventListener('click', async () => {
-          if (!confirm('Apakah Anda yakin ingin menghapus event ini?')) return;
+          if (!await customConfirm('Apakah Anda yakin ingin menghapus event ini?')) return;
           const id = btn.dataset.id;
           try {
             await deleteEvent(id, token);
             showToast('Event berhasil dihapus!');
             loadMyEvents();
           } catch (err) {
-            alert('Gagal menghapus event: ' + err.message);
+            await customAlert('Gagal menghapus event: ' + err.message);
           }
         });
       });
@@ -233,9 +233,9 @@ window.initDashboard = function() {
       
       try {
         await updateMyProfile(formData, localStorage.getItem('access_token'));
-        alert('Profil berhasil diperbarui!');
+        await customAlert('Profil berhasil diperbarui!');
       } catch (err) {
-        alert('Gagal memperbarui profil: ' + err.message);
+        await customAlert('Gagal memperbarui profil: ' + err.message);
       } finally {
         btn.textContent = 'Simpan Profil';
       }
@@ -266,11 +266,11 @@ window.initDashboard = function() {
         if (coverInput.files[0]) formData.append('cover', coverInput.files[0]);
         
         await submitSong(formData, localStorage.getItem('access_token'));
-        alert('Rilisan berhasil diunggah!');
+        await customAlert('Rilisan berhasil diunggah!');
         songForm.reset();
         loadMySongs(); // Refresh songs list
       } catch (err) {
-        alert('Gagal mengunggah rilisan: ' + err.message);
+        await customAlert('Gagal mengunggah rilisan: ' + err.message);
       } finally {
         btn.textContent = 'PUBLISH LAGU';
       }

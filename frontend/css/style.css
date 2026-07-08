@@ -1072,3 +1072,88 @@ body.theme-dark {
   img { max-width: 100%; height: auto; }
   table { font-size: 13px; }
 }
+
+/* ================================================================
+   Premium Table and Button Styles for Admin/Dashboard
+   ================================================================ */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+th, td {
+  padding: 14px 18px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--grey);
+  background: rgba(255, 255, 255, 0.03);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+/* Premium Button Styles */
+.btn-primary, .btn-danger {
+  font-family: 'Work Sans', sans-serif;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease-out;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: var(--red);
+  color: #fff;
+  border: 1px solid var(--red);
+}
+
+.btn-primary:hover {
+  background: #ff4d44;
+  border-color: #ff4d44;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(229,52,42,0.25);
+}
+
+.btn-danger {
+  background: rgba(229, 52, 42, 0.12);
+  border: 1px solid rgba(229, 52, 42, 0.35);
+  color: #ff6b6b;
+}
+
+.btn-danger:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(229,52,42,0.25);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  height: 28px;
+}
+
