@@ -372,7 +372,347 @@ window.initApp = function() {
   if (typeof initShareButtons === 'function') initShareButtons();
   if (typeof initMobileMenu === 'function') initMobileMenu();
   if (typeof initAutoEmbeds === 'function') initAutoEmbeds();
+  if (typeof loadHomeReviews === 'function') loadHomeReviews();
+  if (typeof loadHomeLifestyle === 'function') loadHomeLifestyle();
+  if (typeof loadHomeFeatures === 'function') loadHomeFeatures();
+  if (typeof loadSongMeanings === 'function') loadSongMeanings();
 };
+
+// ─── Custom Modal & Content Loaders ──────────────────────────────────────────
+
+function showContentModal(title, subtitle, contentHtml) {
+  const overlay = document.createElement('div');
+  overlay.className = 'custom-modal-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+  overlay.style.backdropFilter = 'blur(10px)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '99999';
+  overlay.style.animation = 'fadeIn 0.2s ease-out';
+
+  const styleId = 'custom-content-modal-style';
+  let style = document.getElementById(styleId);
+  if (!style) {
+    style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      .custom-content-box {
+        background: #0f0f0f;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 40px;
+        width: 90%;
+        max-width: 650px;
+        max-height: 85vh;
+        overflow-y: auto;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+        font-family: 'Work Sans', sans-serif;
+        color: #f2f1ec;
+        position: relative;
+      }
+      .custom-content-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: var(--grey, #8a8a85);
+        font-size: 24px;
+        cursor: pointer;
+        transition: color 0.2s;
+      }
+      .custom-content-close:hover {
+        color: #fff;
+      }
+      .custom-content-title {
+        font-family: 'Archivo Black', sans-serif;
+        font-size: 22px;
+        line-height: 1.2;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+        color: #fff;
+      }
+      .custom-content-subtitle {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--red, #e5342a);
+        text-transform: uppercase;
+        margin-bottom: 24px;
+        letter-spacing: 0.1em;
+      }
+      .custom-content-body {
+        font-size: 15px;
+        line-height: 1.7;
+        opacity: 0.9;
+        white-space: pre-wrap;
+      }
+      .custom-content-body p {
+        margin-bottom: 16px;
+      }
+      .custom-content-body strong {
+        color: #fff;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  overlay.innerHTML = `
+    <div class="custom-content-box">
+      <button class="custom-content-close" aria-label="Tutup modal">×</button>
+      <div class="custom-content-subtitle">${subtitle}</div>
+      <h3 class="custom-content-title">${title}</h3>
+      <div class="custom-content-body">${contentHtml}</div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  const closeBtn = overlay.querySelector('.custom-content-close');
+  const close = () => overlay.remove();
+  closeBtn.addEventListener('click', close);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) close();
+  });
+}
+
+async function loadHomeReviews() {
+  const colReview = document.getElementById('col-review');
+  const colRadar = document.getElementById('col-radar');
+
+  try {
+    const reviewsRes = await getReviews('music');
+    const reviews = reviewsRes.data || [];
+    const latestReview = reviews[0];
+
+    if (latestReview) {
+      const byline = document.querySelector('.article-demo .byline');
+      const titleEl = document.querySelector('.article-demo h4');
+      const bodyTextEls = document.querySelectorAll('.article-demo .body-text');
+
+      if (titleEl) titleEl.textContent = latestReview.title;
+      if (byline) byline.textContent = `Review · ${new Date(latestReview.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })} · oleh Redaksi`;
+      
+      if (bodyTextEls.length) {
+        const paragraphs = latestReview.content.split('\n\n');
+        bodyTextEls[0].textContent = paragraphs[0] || '';
+        if (bodyTextEls[1]) bodyTextEls[1].textContent = paragraphs[1] || '';
+      }
+
+      const embedList = document.querySelector('.article-demo .embed-list');
+      if (embedList) {
+        embedList.innerHTML = '';
+        if (latestReview.artist?.spotify) {
+          embedList.innerHTML += `<a href="${latestReview.artist.spotify}" class="auto-embed-link">Spotify Artist</a>`;
+        }
+        embedList.innerHTML += `
+          <a href="https://open.spotify.com/track/2AT8iROs4FQueDv2c8q2KE" class="auto-embed-link">Spotify: Contoh Lagu Hip-Hop</a>
+          <a href="https://www.youtube.com/watch?v=VqB1uoDTdKM" class="auto-embed-link">YouTube: Contoh Video Musik</a>
+        `;
+        initAutoEmbeds();
+      }
+
+      if (colReview) {
+        colReview.addEventListener('click', () => {
+          showContentModal(
+            latestReview.title,
+            `Review · Rating: ${latestReview.rating || '–'}/10`,
+            `<p>${latestReview.content.replace(/\n\n/g, '</p><p>')}</p>`
+          );
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load home reviews:', err);
+  }
+
+  if (colRadar) {
+    colRadar.addEventListener('click', async () => {
+      try {
+        const radarRes = await getReviews('radar');
+        const radars = radarRes.data || [];
+        if (!radars.length) {
+          showContentModal('Release Radar', 'Rilisan Minggu Ini', '<p>Belum ada kurasi rilisan minggu ini.</p>');
+          return;
+        }
+
+        const html = radars.map(r => `
+          <div style="margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px;">
+            <div style="font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--red); text-transform:uppercase;">${escHtml(r.artist?.name || 'Unknown Artist')}</div>
+            <h4 style="font-family:'Archivo Black', sans-serif; font-size:18px; margin: 4px 0 8px 0; color:#fff;">${escHtml(r.title)}</h4>
+            <p style="font-size:14px; opacity:0.85; line-height:1.6;">${escHtml(r.content)}</p>
+          </div>
+        `).join('');
+
+        showContentModal('Release Radar', 'Kumpulan Rilisan Terkurasi', html);
+      } catch (err) {
+        console.error('Failed to load release radar:', err);
+      }
+    });
+  }
+}
+
+async function loadHomeLifestyle() {
+  const cards = {
+    'life-1': 'streetwear',
+    'life-2': 'graffiti',
+    'life-3': 'dance'
+  };
+
+  const labels = {
+    'streetwear': 'Streetwear / Fashion',
+    'graffiti': 'Graffiti / Mural',
+    'dance': 'Dance / Breaking'
+  };
+
+  Object.entries(cards).forEach(([cardClass, category]) => {
+    const el = document.querySelector(`.${cardClass}`);
+    if (el) {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', async () => {
+        try {
+          const res = await getLifestyle(category);
+          const posts = res.data || [];
+          const latest = posts[0];
+
+          if (!latest) {
+            showContentModal(labels[category], 'Artikel Budaya', '<p>Belum ada artikel di kategori ini.</p>');
+            return;
+          }
+
+          const dateStr = new Date(latest.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+          const subtitle = `${labels[category]} · ${latest.city || ''} · ${dateStr}`;
+
+          showContentModal(
+            latest.title,
+            subtitle,
+            `<p>${latest.content.replace(/\n\n/g, '</p><p>')}</p>`
+          );
+        } catch (err) {
+          console.error(`Failed to load lifestyle ${category}:`, err);
+        }
+      });
+    }
+  });
+}
+
+async function loadHomeFeatures() {
+  const card = document.getElementById('feature-card');
+  try {
+    const res = await getEditorials('interviews');
+    const posts = res.data || [];
+    const latest = posts[0];
+
+    if (latest) {
+      const quoteEl = document.querySelector('.feature-quote');
+      const descEl = document.querySelector('.feature-editorial p:not(.feature-quote)');
+
+      if (quoteEl) {
+        quoteEl.innerHTML = `"${latest.title.replace(/"/g, '')}"`;
+      }
+      if (descEl) {
+        const paragraphs = latest.content.split('\n\n');
+        descEl.textContent = paragraphs[0] || '';
+      }
+
+      if (card) {
+        card.addEventListener('click', () => {
+          showContentModal(
+            latest.title,
+            'Eksklusif Interview · Skena Bawah Tanah',
+            `<p>${latest.content.replace(/\n\n/g, '</p><p>')}</p>`
+          );
+        });
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load editorials:', err);
+  }
+}
+
+async function loadSongMeanings() {
+  const colMeaning = document.getElementById('col-meaning');
+  if (!colMeaning) return;
+
+  colMeaning.addEventListener('click', async () => {
+    try {
+      const data = await getSongs();
+      const songs = Array.isArray(data) ? data : (data.data || []);
+      
+      const songsWithMeaning = songs.filter(s => s.song_meaning && s.song_meaning.content);
+
+      if (!songsWithMeaning.length) {
+        showContentModal(
+          'Makna Lagu',
+          'Cerita Rilisan',
+          '<p>Belum ada musisi yang membagikan makna di balik lagunya saat ini. Jadilah yang pertama!</p>'
+        );
+        return;
+      }
+
+      const listHtml = `
+        <div class="meaning-list-container" style="display:flex; flex-direction:column; gap:16px;">
+          ${songsWithMeaning.map(s => {
+            const artistName = s.artist?.name || 'Unknown Artist';
+            const safeContent = s.song_meaning.content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            return `
+              <div class="meaning-item" data-title="${escHtml(s.title)}" data-artist="${escHtml(artistName)}" data-content="${escHtml(safeContent)}" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:16px; border-radius:6px; cursor:pointer; transition:all 0.2s;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div style="width:40px; height:40px; background:var(--ink); border-radius:4px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.1);">
+                    <span style="font-size:18px; color:var(--red);">♪</span>
+                  </div>
+                  <div>
+                    <h5 style="font-family:'Archivo Black', sans-serif; font-size:15px; margin:0; color:#fff;">${escHtml(s.title)}</h5>
+                    <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--grey);">${escHtml(artistName)}</span>
+                  </div>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      showContentModal('Makna Lagu', 'Pilih lagu untuk membaca ceritanya', listHtml);
+
+      const modal = document.querySelector('.custom-modal-overlay');
+      if (modal) {
+        modal.querySelectorAll('.meaning-item').forEach(item => {
+          item.addEventListener('click', () => {
+            const title = item.dataset.title;
+            const artist = item.dataset.artist;
+            const content = item.dataset.content;
+            
+            modal.remove();
+
+            showContentModal(
+              title,
+              `Makna Lagu · oleh ${artist}`,
+              `<p style="font-size:16px; font-style:italic; border-left:3px solid var(--red); padding-left:16px; margin-bottom:24px; color:var(--grey);">${title} menceritakan tentang...</p>
+               <p>${escHtml(content).replace(/\n\n/g, '</p><p>')}</p>
+               <div style="margin-top:30px;"><button class="btn primary" id="back-to-meanings" style="padding:8px 16px; font-size:12px;">&larr; Kembali ke Daftar</button></div>`
+            );
+
+            const backBtn = document.getElementById('back-to-meanings');
+            if (backBtn) {
+              backBtn.addEventListener('click', () => {
+                document.querySelector('.custom-modal-overlay')?.remove();
+                document.getElementById('col-meaning').click();
+              });
+            }
+          });
+        });
+      }
+
+    } catch (err) {
+      console.error('Failed to load song meanings:', err);
+    }
+  });
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   // For safety if router.js doesn't run, though router.js does the primary init

@@ -255,6 +255,7 @@ window.initDashboard = function() {
         formData.append('title', document.getElementById('song-title').value);
         formData.append('slug', document.getElementById('song-slug').value);
         formData.append('release_date', document.getElementById('song-date').value);
+        formData.append('meaning', document.getElementById('song-meaning').value);
         
         const tokenPayload = getDecodedToken();
         formData.append('artist_id', tokenPayload.id); 
