@@ -17,6 +17,7 @@ router.get('/', async (_req, res) => {
         artist: true,
         genre: true,
         producer: true,
+        song_meaning: true,
       },
       orderBy: { created_at: 'desc' },
     });
@@ -71,7 +72,7 @@ router.get('/:slug', async (req, res) => {
 // POST /api/songs — tambah lagu baru
 router.post('/', requireAuth, upload.fields([{ name: 'audio', maxCount: 1 }, { name: 'cover', maxCount: 1 }]), async (req: any, res) => {
   try {
-    const { title, slug, genre_id, producer_id, release_date } = req.body;
+    const { title, slug, genre_id, producer_id, release_date, meaning } = req.body;
 
     if (!title || !slug) {
       return res.status(400).json({ message: 'Missing required fields: title, slug' });
@@ -133,8 +134,15 @@ router.post('/', requireAuth, upload.fields([{ name: 'audio', maxCount: 1 }, { n
         audio_url: audio_url || null,
         cover_image: cover_image || null,
         release_date: release_date ? new Date(release_date) : null,
+        ...(meaning ? {
+          song_meaning: {
+            create: {
+              content: meaning
+            }
+          }
+        } : {})
       },
-      include: { artist: true, genre: true, producer: true },
+      include: { artist: true, genre: true, producer: true, song_meaning: true },
     });
 
     return res.status(201).json(song);
