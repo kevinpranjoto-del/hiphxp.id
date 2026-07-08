@@ -9,6 +9,187 @@
 const IS_LOCAL = ['localhost', '127.0.0.1', ''].includes(window.location.hostname) && window.location.port !== '4000';
 export const API_BASE_URL = IS_LOCAL ? 'http://localhost:4000' : ''; // Gunakan relative path untuk Unified Deployment (Backend + Frontend satu server)
 
+// ─── Custom Modal Dialog System ─────────────────────────────────────────────
+function createModalOverlay(contentHtml) {
+  const overlay = document.createElement('div');
+  overlay.className = 'custom-modal-overlay';
+  overlay.style.position = 'fixed';
+  overlay.style.top = '0';
+  overlay.style.left = '0';
+  overlay.style.width = '100vw';
+  overlay.style.height = '100vh';
+  overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.85)';
+  overlay.style.backdropFilter = 'blur(8px)';
+  overlay.style.display = 'flex';
+  overlay.style.justifyContent = 'center';
+  overlay.style.alignItems = 'center';
+  overlay.style.zIndex = '99999';
+  overlay.style.animation = 'fadeIn 0.2s ease-out';
+
+  let style = document.getElementById('custom-modal-style');
+  if (!style) {
+    style = document.createElement('style');
+    style.id = 'custom-modal-style';
+    style.textContent = `
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+      .custom-modal-box {
+        background: #0f0f0f;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 8px;
+        padding: 30px;
+        width: 90%;
+        max-width: 420px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        font-family: 'Work Sans', sans-serif;
+        color: #f2f1ec;
+        text-align: center;
+      }
+      .custom-modal-title {
+        font-family: 'Archivo Black', sans-serif;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 15px;
+        color: var(--red, #e5342a);
+      }
+      .custom-modal-body {
+        font-size: 14px;
+        line-height: 1.6;
+        margin-bottom: 24px;
+        opacity: 0.9;
+      }
+      .custom-modal-input {
+        width: 100%;
+        padding: 10px 14px;
+        background: #151515;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 4px;
+        color: #fff;
+        font-size: 14px;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+        outline: none;
+        transition: border-color 0.2s;
+      }
+      .custom-modal-input:focus {
+        border-color: var(--red, #e5342a);
+      }
+      .custom-modal-footer {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+      }
+      .custom-modal-btn {
+        padding: 8px 20px;
+        border-radius: 4px;
+        font-weight: 600;
+        font-size: 13px;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s;
+        min-width: 90px;
+        font-family: 'Work Sans', sans-serif;
+      }
+      .custom-modal-btn-primary {
+        background: var(--red, #e5342a);
+        color: #fff;
+      }
+      .custom-modal-btn-primary:hover {
+        background: #ff4d44;
+      }
+      .custom-modal-btn-secondary {
+        background: rgba(255,255,255,0.06);
+        color: #f2f1ec;
+        border: 1px solid rgba(255,255,255,0.1);
+      }
+      .custom-modal-btn-secondary:hover {
+        background: rgba(255,255,255,0.12);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+
+  overlay.innerHTML = contentHtml;
+  document.body.appendChild(overlay);
+  return overlay;
+}
+
+window.customAlert = (message) => {
+  return new Promise((resolve) => {
+    const html = `
+      <div class="custom-modal-box">
+        <div class="custom-modal-title">PEMBERITAHUAN</div>
+        <div class="custom-modal-body">${message}</div>
+        <div class="custom-modal-footer">
+          <button class="custom-modal-btn custom-modal-btn-primary" id="custom-alert-ok">OK</button>
+        </div>
+      </div>
+    `;
+    const overlay = createModalOverlay(html);
+    overlay.querySelector('#custom-alert-ok').addEventListener('click', () => {
+      overlay.remove();
+      resolve();
+    });
+  });
+};
+
+window.customConfirm = (message) => {
+  return new Promise((resolve) => {
+    const html = `
+      <div class="custom-modal-box">
+        <div class="custom-modal-title">KONFIRMASI</div>
+        <div class="custom-modal-body">${message}</div>
+        <div class="custom-modal-footer">
+          <button class="custom-modal-btn custom-modal-btn-secondary" id="custom-confirm-cancel">Batal</button>
+          <button class="custom-modal-btn custom-modal-btn-primary" id="custom-confirm-ok">Ya</button>
+        </div>
+      </div>
+    `;
+    const overlay = createModalOverlay(html);
+    overlay.querySelector('#custom-confirm-ok').addEventListener('click', () => {
+      overlay.remove();
+      resolve(true);
+    });
+    overlay.querySelector('#custom-confirm-cancel').addEventListener('click', () => {
+      overlay.remove();
+      resolve(false);
+    });
+  });
+};
+
+window.customPrompt = (message, defaultValue = '', type = 'text') => {
+  return new Promise((resolve) => {
+    const html = `
+      <div class="custom-modal-box">
+        <div class="custom-modal-title">MASUKKAN INPUT</div>
+        <div class="custom-modal-body">${message}</div>
+        <input type="${type}" class="custom-modal-input" id="custom-prompt-input" value="${defaultValue}">
+        <div class="custom-modal-footer">
+          <button class="custom-modal-btn custom-modal-btn-secondary" id="custom-prompt-cancel">Batal</button>
+          <button class="custom-modal-btn custom-modal-btn-primary" id="custom-prompt-ok">Kirim</button>
+        </div>
+      </div>
+    `;
+    const overlay = createModalOverlay(html);
+    const input = overlay.querySelector('#custom-prompt-input');
+    input.focus();
+    input.select();
+
+    overlay.querySelector('#custom-prompt-ok').addEventListener('click', () => {
+      const val = input.value;
+      overlay.remove();
+      resolve(val);
+    });
+    overlay.querySelector('#custom-prompt-cancel').addEventListener('click', () => {
+      overlay.remove();
+      resolve(null);
+    });
+  });
+};
+
+
 export function resolveUrl(url) {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) return url;
@@ -21,9 +202,15 @@ export function resolveUrl(url) {
  */
 export async function apiFetch(path, options = {}) {
   try {
+    const token = localStorage.getItem('access_token');
+    const headers = { 'Content-Type': 'application/json', ...options.headers };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
-      headers: { 'Content-Type': 'application/json', ...options.headers },
+      headers
     });
     if (!response.ok) {
       if (response.status === 401 && !path.includes('/auth/login')) {

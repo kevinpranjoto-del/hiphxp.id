@@ -30,7 +30,7 @@
   <a href="index.html#kerjasama">Kerja Sama</a>
   <a href="index.html#kontak">Kontak</a>
   <a href="music.html">Cari Lagu</a>
-  <a href="login.html" class="mobile-login-btn" style="color:var(--brand); font-weight:600;">Portal Musisi / Login</a>
+  <a href="#" onclick="logout(); return false;" class="mobile-logout-btn" style="color:var(--red); font-weight:600;">Keluar / Logout</a>
 </div>
 
 <header class="site">
@@ -75,6 +75,7 @@
           <button class="dash-tab" data-target="users">Users</button>
           <button class="dash-tab" data-target="songs">Songs</button>
           <button class="dash-tab" data-target="events">Events</button>
+          <button class="logout" onclick="logout()">Keluar</button>
         </nav>
       </aside>
 
@@ -235,7 +236,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const mobileOpen = document.getElementById('mobile-open');
+    const mobileOpen = document.getElementById('nav-hamburger') || document.getElementById('mobile-open');
     const mobileClose = document.getElementById('mobile-close');
     const mobileMenu = document.getElementById('mobile-menu');
     if (mobileOpen && mobileClose && mobileMenu) {
