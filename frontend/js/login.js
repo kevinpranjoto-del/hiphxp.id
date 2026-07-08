@@ -27,7 +27,7 @@ window.initLogin = function() {
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        if (payload.account_type === 'ADMIN' || payload.account_type === 'SUPER_ADMIN') {
+        if (payload.role === 'ADMIN' || payload.role === 'SUPER_ADMIN') {
           window.location.href = 'admin.html';
         } else {
           window.location.href = 'dashboard.html';
@@ -49,7 +49,7 @@ window.initLogin = function() {
           localStorage.setItem('access_token', res.accessToken);
           try {
             const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
-            if (payload.account_type === 'ADMIN' || payload.account_type === 'SUPER_ADMIN') {
+            if (payload.role === 'ADMIN' || payload.role === 'SUPER_ADMIN') {
               window.location.href = 'admin.html';
             } else {
               window.location.href = 'dashboard.html';
