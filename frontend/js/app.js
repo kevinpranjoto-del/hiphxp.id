@@ -661,15 +661,13 @@ async function loadSongMeanings() {
             const artistName = s.artist?.name || 'Unknown Artist';
             const safeContent = s.song_meaning.content.replace(/'/g, "\\'").replace(/"/g, '&quot;');
             return `
-              <div class="meaning-item" data-title="${escHtml(s.title)}" data-artist="${escHtml(artistName)}" data-content="${escHtml(safeContent)}" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:16px; border-radius:6px; cursor:pointer; transition:all 0.2s;">
-                <div style="display:flex; align-items:center; gap:12px;">
-                  <div style="width:40px; height:40px; background:var(--ink); border-radius:4px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.1);">
-                    <span style="font-size:18px; color:var(--red);">♪</span>
-                  </div>
-                  <div>
-                    <h5 style="font-family:'Archivo Black', sans-serif; font-size:15px; margin:0; color:#fff;">${escHtml(s.title)}</h5>
-                    <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--grey);">${escHtml(artistName)}</span>
-                  </div>
+              <div class="meaning-item" data-title="${escHtml(s.title)}" data-artist="${escHtml(artistName)}" data-content="${escHtml(safeContent)}" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); padding:16px; border-radius:6px; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:row; align-items:center; justify-content:flex-start; text-align:left; width:100%; box-sizing:border-box;">
+                <div style="width:40px; height:40px; background:var(--ink); border-radius:4px; display:flex; align-items:center; justify-content:center; border:1px solid rgba(255,255,255,0.1); margin-right:16px; flex-shrink:0;">
+                  <span style="font-size:18px; color:var(--red);">♪</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start; text-align:left;">
+                  <h5 style="font-family:'Archivo Black', sans-serif; font-size:15px; margin:0; color:#fff; text-align:left;">${escHtml(s.title)}</h5>
+                  <span style="font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--grey); text-align:left;">${escHtml(artistName)}</span>
                 </div>
               </div>
             `;
