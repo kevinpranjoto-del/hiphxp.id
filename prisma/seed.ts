@@ -284,6 +284,100 @@ async function main() {
   }
   console.log('✅ Events seeded');
 
+  // ─── 7. SONGS MEANINGS ────────────────────────────────────────────────────
+  const songBara = await prisma.song.findFirst({ where: { slug: 'beton-dan-bara' } });
+  if (songBara) {
+    await prisma.songMeaning.upsert({
+      where: { song_id: songBara.id },
+      update: {},
+      create: {
+        song_id: songBara.id,
+        content: 'Lagu "Beton & Bara" menceritakan perjuangan keras masyarakat kelas pekerja di wilayah suburban Jakarta. Beton merepresentasikan kerasnya infrastruktur kota, sedangkan Bara adalah api semangat bertahan hidup yang tidak pernah padam di tengah keterbatasan ekonomi.',
+      }
+    });
+  }
+  console.log('✅ Song Meanings seeded');
+
+  // ─── 8. MUSIC REVIEWS ─────────────────────────────────────────────────────
+  await prisma.musicReview.upsert({
+    where: { slug: 'beton-dan-bara-review' },
+    update: {},
+    create: {
+      title: '"Beton & Bara" — Suara Baru dari Pinggiran Kota',
+      slug: 'beton-dan-bara-review',
+      content: 'EP terbaru "Beton & Bara" dari Yung Kota membawa produksi lo-fi yang mentah dan lirik yang berbicara langsung soal hidup di pinggiran ibu kota. Setiap track terasa seperti catatan harian yang direkam di kamar sempit — jujur, kasar, tanpa polesan berlebih.\n\nBagian paling kuat ada di pertengahan EP, ketika beat melambat dan ruang diberikan sepenuhnya pada penceritaan. Yung Kota membuktikan dirinya sebagai salah satu penulis lirik paling tajam di generasinya.',
+      rating: 8.5,
+      artist_id: artistIds['yung-kota'],
+    }
+  });
+  console.log('✅ Music Reviews seeded');
+
+  // ─── 9. RELEASE RADAR ─────────────────────────────────────────────────────
+  const radars = [
+    { title: 'Senja di Malioboro', slug: 'senja-di-malioboro-radar', content: 'Rilisan terbaru dari Sudut Senja yang mengawinkan vokal R&B lembut dengan alunan neo-soul khas Yogyakarta.', artist_id: artistIds['sudut-senja'] },
+    { title: 'Pesisir Anthem', slug: 'pesisir-anthem-radar', content: 'Lagu trap bertenaga tinggi yang diproduseri oleh Pesisir Beats dengan rima tajam tentang kehidupan pesisir Surabaya.', artist_id: artistIds['pesisir-beats'] },
+  ];
+  for (const r of radars) {
+    await prisma.releaseRadar.upsert({
+      where: { slug: r.slug },
+      update: {},
+      create: r
+    });
+  }
+  console.log('✅ Release Radar seeded');
+
+  // ─── 10. LIFESTYLE POSTS ──────────────────────────────────────────────────
+  await prisma.streetwearPost.upsert({
+    where: { slug: 'gaya-lokal-standar-global' },
+    update: {},
+    create: {
+      title: 'Gaya Lokal, Standar Global',
+      slug: 'gaya-lokal-standar-global',
+      content: 'Streetwear lokal kini sedang mendominasi skena fashion anak muda. Dengan menggabungkan elemen grafis khas hip-hop dan material berkualitas tinggi, brand-brand lokal membuktikan bahwa karya dalam negeri mampu bersaing dengan raksasa global. Dari panggung gigs hingga sudut jalanan kota, gaya ini mendefinisikan ekspresi diri tanpa batas.',
+      city: 'Jakarta',
+      province: 'DKI Jakarta',
+      status: 'PUBLISHED',
+    }
+  });
+  await prisma.graffitiPost.upsert({
+    where: { slug: 'tembok-bicara' },
+    update: {},
+    create: {
+      title: 'Tembok Bicara',
+      slug: 'tembok-bicara',
+      content: 'Graffiti bukan sekadar coretan vandal, melainkan media protes dan ekspresi visual yang menghidupkan tembok-tembok beton kota yang mati. Melalui kolaborasi antar seniman jalanan, kini mural dan graffiti menjadi galeri terbuka yang merekam denyut nadi dan suara kolektif warga kota.',
+      city: 'Bandung',
+      province: 'Jawa Barat',
+      status: 'PUBLISHED',
+    }
+  });
+  await prisma.dancePost.upsert({
+    where: { slug: 'gerak-jalanan' },
+    update: {},
+    create: {
+      title: 'Gerak Jalanan',
+      slug: 'gerak-jalanan',
+      content: 'Skena breakdance dan street dance urban terus berkembang pesat. Melalui cypher bulanan dan battle breaking yang kompetitif, para b-boy dan b-girl lokal tidak hanya melatih ketangkasan fisik, tetapi juga mempererat solidaritas komunitas tari jalanan di Indonesia.',
+      city: 'Surabaya',
+      province: 'Jawa Timur',
+      status: 'PUBLISHED',
+    }
+  });
+  console.log('✅ Lifestyle posts seeded');
+
+  // ─── 11. EDITORIALS / FEATURES ────────────────────────────────────────────
+  await prisma.interview.upsert({
+    where: { slug: 'saya-nggak-nulis-buat-trending' },
+    update: {},
+    create: {
+      title: '"Saya nggak nulis buat trending. Saya nulis biar 10 tahun lagi masih relevan."',
+      slug: 'saya-nggak-nulis-buat-trending',
+      content: 'Dalam wawancara eksklusif kali ini, kami duduk bersama produser dan penulis lagu veteran yang telah 12 tahun konsisten membentuk lanskap musik independen. Soal proses kreatif, kegagalan, dan alasan mengapa dia memilih untuk tetap independen meskipun banyak tawaran label besar menghampiri.\n\n"Bagi saya, musik adalah artefak waktu. Jika Anda menulis hanya untuk trending di media sosial hari ini, maka karya Anda akan mati besok. Tulislah sesuatu yang jujur, sesuatu yang merekam apa yang benar-benar terjadi di sekitar Anda," ujarnya.',
+      status: 'PUBLISHED',
+    }
+  });
+  console.log('✅ Editorial Interviews seeded');
+
   console.log('\n🎉 Seeding complete!');
 }
 
