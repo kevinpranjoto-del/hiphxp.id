@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { prisma } from '../../shared/prisma';
+import bcrypt from 'bcryptjs';
 import { requireAuth } from '../../shared/authMiddleware';
 
 const router = Router();
 
 // Middleware to ensure admin role
 const requireAdmin = (req: any, res: any, next: any) => {
-  if (req.user?.account_type !== 'ADMIN') {
+  if (req.user?.role !== 'ADMIN' && req.user?.role !== 'SUPER_ADMIN') {
     return res.status(403).json({ message: 'Forbidden: Admins only' });
   }
   next();
@@ -57,6 +58,23 @@ router.delete('/users/:id', async (req, res) => {
     res.json({ success: true });
   } catch (e) {
     res.status(500).json({ message: 'Failed to delete user' });
+  }
+});
+
+router.put('/users/:id/password', async (req, res) => {
+  try {
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+    const password_hash = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: { id: req.params.id },
+      data: { password_hash }
+    });
+    res.json({ success: true });
+  } catch (e) {
+    res.status(500).json({ message: 'Failed to update password' });
   }
 });
 

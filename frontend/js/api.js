@@ -19,7 +19,7 @@ export function resolveUrl(url) {
 /**
  * Generic fetch wrapper with error handling
  */
-async function apiFetch(path, options = {}) {
+export async function apiFetch(path, options = {}) {
   try {
     const response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
