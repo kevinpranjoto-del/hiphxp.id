@@ -181,8 +181,8 @@
                 <input type="text" id="review-title" required placeholder="Cth: Beton & Bara Wajib Dengar" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
               </div>
               <div class="field" style="display:flex; flex-direction:column; gap:6px;">
-                <label style="font-size:12px; font-weight:600; opacity:0.8;">Slug (URL) *</label>
-                <input type="text" id="review-slug" required placeholder="Cth: beton-bara-wajib-dengar" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
+                <label style="font-size:12px; font-weight:600; opacity:0.8;">Slug (URL) * <span style="font-size:10px; opacity:0.6; font-weight:normal;">(Terisi otomatis dari judul)</span></label>
+                <input type="text" id="review-slug" required readonly style="padding:10px 14px; background:#222; border:1px solid rgba(255,255,255,0.05); border-radius:4px; color:#aaa; cursor:not-allowed;">
               </div>
               <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
                 <div class="field" style="display:flex; flex-direction:column; gap:6px;">
@@ -229,8 +229,8 @@
                 <input type="text" id="radar-title" required placeholder="Cth: Senja di Malioboro" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
               </div>
               <div class="field" style="display:flex; flex-direction:column; gap:6px;">
-                <label style="font-size:12px; font-weight:600; opacity:0.8;">Slug (URL) *</label>
-                <input type="text" id="radar-slug" required placeholder="Cth: senja-di-malioboro" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
+                <label style="font-size:12px; font-weight:600; opacity:0.8;">Slug (URL) * <span style="font-size:10px; opacity:0.6; font-weight:normal;">(Terisi otomatis dari judul)</span></label>
+                <input type="text" id="radar-slug" required readonly style="padding:10px 14px; background:#222; border:1px solid rgba(255,255,255,0.05); border-radius:4px; color:#aaa; cursor:not-allowed;">
               </div>
               <div class="field" style="display:flex; flex-direction:column; gap:6px;">
                 <label style="font-size:12px; font-weight:600; opacity:0.8;">Artis *</label>
@@ -280,8 +280,8 @@
                 </div>
               </div>
               <div class="field" style="display:flex; flex-direction:column; gap:6px;">
-                <label style="font-size:12px; font-weight:600; opacity:0.8;">Slug (URL) *</label>
-                <input type="text" id="lifestyle-slug" required placeholder="Cth: kolaborasi-graffiti-bandung" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
+                <label style="font-size:12px; font-weight:600; opacity:0.8;">Slug (URL) * <span style="font-size:10px; opacity:0.6; font-weight:normal;">(Terisi otomatis dari judul)</span></label>
+                <input type="text" id="lifestyle-slug" required readonly style="padding:10px 14px; background:#222; border:1px solid rgba(255,255,255,0.05); border-radius:4px; color:#aaa; cursor:not-allowed;">
               </div>
               <div class="form-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
                 <div class="field" style="display:flex; flex-direction:column; gap:6px;">
@@ -292,6 +292,10 @@
                   <label style="font-size:12px; font-weight:600; opacity:0.8;">Provinsi</label>
                   <input type="text" id="lifestyle-province" placeholder="Cth: Jawa Barat" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
                 </div>
+              </div>
+              <div class="field" style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:12px; font-weight:600; opacity:0.8;">Gambar Utama / Featured Image</label>
+                <input type="file" id="lifestyle-image" accept="image/*" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
               </div>
               <div class="field" style="display:flex; flex-direction:column; gap:6px;">
                 <label style="font-size:12px; font-weight:600; opacity:0.8;">Isi Artikel/Konten *</label>
@@ -332,8 +336,12 @@
                 <input type="text" id="interview-title" required placeholder="Cth: Wawancara Eksklusif Bersama Yung Kota" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
               </div>
               <div class="field" style="display:flex; flex-direction:column; gap:6px;">
-                <label style="font-size:12px; font-weight:600; opacity:0.8;">Slug (URL) *</label>
-                <input type="text" id="interview-slug" required placeholder="Cth: wawancara-yung-kota" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
+                <label style="font-size:12px; font-weight:600; opacity:0.8;">Slug (URL) * <span style="font-size:10px; opacity:0.6; font-weight:normal;">(Terisi otomatis dari judul)</span></label>
+                <input type="text" id="interview-slug" required readonly style="padding:10px 14px; background:#222; border:1px solid rgba(255,255,255,0.05); border-radius:4px; color:#aaa; cursor:not-allowed;">
+              </div>
+              <div class="field" style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:12px; font-weight:600; opacity:0.8;">Gambar Utama / Featured Image</label>
+                <input type="file" id="interview-image" accept="image/*" style="padding:10px 14px; background:#151515; border:1px solid rgba(255,255,255,0.1); border-radius:4px; color:#fff;">
               </div>
               <div class="field" style="display:flex; flex-direction:column; gap:6px;">
                 <label style="font-size:12px; font-weight:600; opacity:0.8;">Konten Wawancara *</label>
