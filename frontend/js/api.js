@@ -203,7 +203,10 @@ export function resolveUrl(url) {
 export async function apiFetch(path, options = {}) {
   try {
     const token = localStorage.getItem('access_token');
-    const headers = { 'Content-Type': 'application/json', ...options.headers };
+    const headers = { ...options.headers };
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }
