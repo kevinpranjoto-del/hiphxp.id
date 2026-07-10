@@ -202,8 +202,9 @@ router.delete('/:id', requireAuth, async (req: any, res) => {
       return res.status(403).json({ message: 'Forbidden: You do not own this song' });
     }
 
-    await prisma.song.delete({
+    await prisma.song.update({
       where: { id: req.params.id },
+      data: { deleted_at: new Date() }
     });
 
     return res.json({ message: 'Song deleted successfully' });
