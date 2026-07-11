@@ -120,6 +120,20 @@ async function loadCollectives(cityFilter = '') {
     const data = await getCollectives(params);
     allCollectives = Array.isArray(data) ? data : (data.data || []);
 
+    // Dynamically build city filter chips on initial load
+    if (!cityFilter) {
+      const filterRow = document.querySelector('.filter-row');
+      if (filterRow) {
+        const cities = [...new Set(allCollectives.map(c => c.city).filter(Boolean))].sort();
+        let chipsHtml = `<div class="chip active" data-city="all" role="button" tabindex="0">Semua Kota</div>`;
+        cities.forEach(city => {
+          chipsHtml += `<div class="chip" data-city="${city}" role="button" tabindex="0">${city}</div>`;
+        });
+        filterRow.innerHTML = chipsHtml;
+        initCityFilter();
+      }
+    }
+
     renderCollectiveGrid(allCollectives);
   } catch {
     grid.innerHTML = '<div class="empty-state" style="color:rgba(242,241,236,0.6)"><p>Gagal memuat direktori.</p></div>';
@@ -170,6 +184,20 @@ async function loadEvents(params = {}) {
   try {
     const data = await getEvents(params);
     const events = Array.isArray(data) ? data : (data.data || []);
+
+    // Dynamically build city select options on initial load
+    if (Object.keys(params).length === 0) {
+      const citySelect = document.getElementById('filter-city');
+      if (citySelect) {
+        const cities = [...new Set(events.map(ev => ev.city).filter(Boolean))].sort();
+        let selectHtml = `<option value="">Semua Kota</option>`;
+        cities.forEach(city => {
+          selectHtml += `<option value="${city}">${city}</option>`;
+        });
+        citySelect.innerHTML = selectHtml;
+      }
+    }
+
     renderEventList(events);
   } catch {
     list.innerHTML = '<div class="empty-state" style="color:rgba(242,241,236,0.6)"><p>Gagal memuat agenda.</p></div>';
