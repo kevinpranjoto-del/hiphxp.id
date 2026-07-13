@@ -46,7 +46,7 @@ img { display: block; max-width: 100%; }
 .mark svg { display: block; }
 .mark-word { font-family: 'Archivo Black', sans-serif; font-size: 19px; text-transform: uppercase; letter-spacing: -0.01em; }
 .mark-word .dot { color: var(--red); }
-.nav-logo { display: block; height: 36px; width: auto; object-fit: contain; mix-blend-mode: screen; }
+.nav-logo { display: block; height: 52px; width: auto; object-fit: contain; mix-blend-mode: screen; }
 
 /* ================================================================
    NAV
