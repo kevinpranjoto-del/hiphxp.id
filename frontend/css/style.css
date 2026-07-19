@@ -367,7 +367,13 @@ footer h5 { font-family: 'JetBrains Mono', monospace; font-size: 11.5px; text-tr
 footer ul { list-style: none; display: flex; flex-direction: column; gap: 9px; }
 footer ul a { font-size: 13.5px; transition: color .15s; }
 footer ul a:hover { color: var(--red); }
-.footer-bottom { display: flex; justify-content: space-between; padding-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; flex-wrap: wrap; gap: 10px; }
+.footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 20px; font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; flex-wrap: wrap; gap: 10px; }
+.footer-logo { display: block; height: 40px; width: auto; object-fit: contain; mix-blend-mode: screen; margin-bottom: 8px; }
+.footer-socials { display: flex; gap: 14px; align-items: center; }
+.footer-socials a { color: rgba(242,241,236,0.5); transition: color .2s; }
+.footer-socials a:hover { color: var(--paper); }
+.footer-socials svg { display: block; }
+footer p.about { font-family: 'Archivo Black', sans-serif; font-size: 14px; letter-spacing: 0.04em; text-transform: uppercase; margin-top: 10px; color: var(--paper); max-width: 260px; }
 
 /* ================================================================
    KONTAK
