@@ -363,6 +363,30 @@ async function main() {
       status: 'PUBLISHED',
     }
   });
+  await prisma.sportPost.upsert({
+    where: { slug: 'aksi-dan-energi' },
+    update: {},
+    create: {
+      title: 'Aksi & Energi',
+      slug: 'aksi-dan-energi',
+      content: 'Komunitas olahraga urban seperti skateboarding, BMX, dan street basketball menyatu rapat dengan budaya hip-hop. Dari park skate kota hingga lapangan terbuka, kecepatan dan ketangkasan fisik berpadu dengan ritme musik jalanan.',
+      city: 'Bandung',
+      province: 'Jawa Barat',
+      status: 'PUBLISHED',
+    }
+  });
+  await prisma.beatboxPost.upsert({
+    where: { slug: 'ritme-tanpa-alat' },
+    update: {},
+    create: {
+      title: 'Ritme Tanpa Alat',
+      slug: 'ritme-tanpa-alat',
+      content: 'Seni beatbox menghidupkan elemen vokal hip-hop tanpa butuh instrumen fisik. Dari perkusi vokal dasar hingga pola bass drum kompleks, komunitas beatboxer lokal terus memecahkan batasan ekspresi suara mulut.',
+      city: 'Yogyakarta',
+      province: 'D.I. Yogyakarta',
+      status: 'PUBLISHED',
+    }
+  });
   console.log('✅ Lifestyle posts seeded');
 
   // ─── 11. EDITORIALS / FEATURES ────────────────────────────────────────────

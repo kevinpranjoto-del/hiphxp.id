@@ -284,7 +284,7 @@ function setupAdminForms() {
   autoSlug('interview-title', 'interview-slug');
 
   // Lifestyle subtab switchers
-  const subtabs = ['streetwear', 'graffiti', 'dance'];
+  const subtabs = ['streetwear', 'graffiti', 'dance', 'sport', 'beatbox'];
   subtabs.forEach(sub => {
     const btn = document.getElementById(`subtab-${sub}`);
     if (btn) {

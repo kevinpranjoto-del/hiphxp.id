@@ -591,13 +591,17 @@ async function loadHomeLifestyle() {
   const cards = {
     'life-1': 'streetwear',
     'life-2': 'graffiti',
-    'life-3': 'dance'
+    'life-3': 'dance',
+    'life-4': 'sport',
+    'life-5': 'beatbox'
   };
 
   const labels = {
     'streetwear': 'Streetwear / Fashion',
     'graffiti': 'Graffiti / Mural',
-    'dance': 'Dance / Breaking'
+    'dance': 'Dance / Breaking',
+    'sport': 'Sport / Skate',
+    'beatbox': 'Beatbox / Sound Art'
   };
 
   Object.entries(cards).forEach(([cardClass, category]) => {
