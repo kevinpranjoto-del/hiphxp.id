@@ -46,4 +46,32 @@ router.get('/dance', async (req, res) => {
   }
 });
 
+// GET /api/content/lifestyle/sport
+router.get('/sport', async (req, res) => {
+  try {
+    const posts = await prisma.sportPost.findMany({
+      where: { deleted_at: null, status: 'PUBLISHED' },
+      orderBy: { created_at: 'desc' },
+    });
+    const all = posts.length ? posts : await prisma.sportPost.findMany({ where: { deleted_at: null }, orderBy: { created_at: 'desc' } });
+    res.json({ data: all });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch sport posts' });
+  }
+});
+
+// GET /api/content/lifestyle/beatbox
+router.get('/beatbox', async (req, res) => {
+  try {
+    const posts = await prisma.beatboxPost.findMany({
+      where: { deleted_at: null, status: 'PUBLISHED' },
+      orderBy: { created_at: 'desc' },
+    });
+    const all = posts.length ? posts : await prisma.beatboxPost.findMany({ where: { deleted_at: null }, orderBy: { created_at: 'desc' } });
+    res.json({ data: all });
+  } catch (error) {
+    res.status(500).json({ message: 'Failed to fetch beatbox posts' });
+  }
+});
+
 export default router;

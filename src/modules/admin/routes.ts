@@ -236,6 +236,10 @@ router.get('/lifestyle/:category', async (req, res) => {
       posts = await prisma.graffitiPost.findMany({ where: { deleted_at: null }, orderBy: { created_at: 'desc' } });
     } else if (category === 'dance') {
       posts = await prisma.dancePost.findMany({ where: { deleted_at: null }, orderBy: { created_at: 'desc' } });
+    } else if (category === 'sport') {
+      posts = await prisma.sportPost.findMany({ where: { deleted_at: null }, orderBy: { created_at: 'desc' } });
+    } else if (category === 'beatbox') {
+      posts = await prisma.beatboxPost.findMany({ where: { deleted_at: null }, orderBy: { created_at: 'desc' } });
     }
     res.json(posts);
   } catch (e) {
@@ -262,6 +266,10 @@ router.post('/lifestyle/:category', upload.single('image'), async (req: any, res
       post = await prisma.graffitiPost.create({ data });
     } else if (category === 'dance') {
       post = await prisma.dancePost.create({ data });
+    } else if (category === 'sport') {
+      post = await prisma.sportPost.create({ data });
+    } else if (category === 'beatbox') {
+      post = await prisma.beatboxPost.create({ data });
     } else {
       return res.status(400).json({ message: 'Invalid category' });
     }
@@ -281,6 +289,10 @@ router.delete('/lifestyle/:category/:id', async (req, res) => {
       await prisma.graffitiPost.update({ where: { id }, data });
     } else if (category === 'dance') {
       await prisma.dancePost.update({ where: { id }, data });
+    } else if (category === 'sport') {
+      await prisma.sportPost.update({ where: { id }, data });
+    } else if (category === 'beatbox') {
+      await prisma.beatboxPost.update({ where: { id }, data });
     } else {
       return res.status(400).json({ message: 'Invalid category' });
     }

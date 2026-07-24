@@ -535,6 +535,38 @@ model DancePost {
   @@map("dance_posts")
 }
 
+model SportPost {
+  id             String        @id @default(uuid()) @db.Uuid
+  title          String
+  slug           String        @unique
+  content        String
+  featured_image String?
+  city           String?
+  province       String?
+  status         ArticleStatus @default(DRAFT)
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  deleted_at     DateTime?
+
+  @@map("sport_posts")
+}
+
+model BeatboxPost {
+  id             String        @id @default(uuid()) @db.Uuid
+  title          String
+  slug           String        @unique
+  content        String
+  featured_image String?
+  city           String?
+  province       String?
+  status         ArticleStatus @default(DRAFT)
+  created_at     DateTime      @default(now())
+  updated_at     DateTime      @updatedAt
+  deleted_at     DateTime?
+
+  @@map("beatbox_posts")
+}
+
 model GalleryItem {
   id          String        @id @default(uuid()) @db.Uuid
   title       String
