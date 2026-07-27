@@ -62,14 +62,17 @@
 
 
 <div class="music-page wrap">
-  <div style="text-align: center; margin-bottom: 40px; display: block;">
+  <div style="text-align: center; margin-bottom: 32px; display: block;">
     <h1 class="display" style="font-size: clamp(30px, 4vw, 48px); margin-bottom: 12px;">Cari Musik</h1>
-    <p style="color: var(--grey);">Temukan rilisan terbaru dari musisi lokal favoritmu.</p>
+    <p style="color: var(--grey);">Ketik nama musisi, judul lagu, atau kota — semua ada di sini.</p>
   </div>
 
-  <div class="search-box">
-    <input type="text" id="search-input" class="search-input" placeholder="Cari judul lagu atau nama musisi...">
-    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+  <!-- Sticky Search Bar -->
+  <div class="search-sticky-wrapper" id="search-sticky-wrapper">
+    <div class="search-box" id="search-box-el">
+      <input type="text" id="search-input" class="search-input" placeholder="Cari musisi, lagu, atau kota..." autocomplete="off">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+    </div>
   </div>
 
   <div id="search-results" class="song-list">
@@ -135,5 +138,20 @@
 <script type="module" src="js/login.js?v=4"></script>
 <script type="module" src="js/dashboard.js?v=4"></script>
 
+<script>
+  // Sticky search bar logic
+  const wrapper = document.getElementById('search-sticky-wrapper');
+  const sentinel = document.createElement('div');
+  sentinel.style.height = '1px';
+  wrapper.parentNode.insertBefore(sentinel, wrapper);
+
+  const observer = new IntersectionObserver(
+    ([entry]) => {
+      wrapper.classList.toggle('is-sticky', !entry.isIntersecting);
+    },
+    { threshold: 0, rootMargin: '-74px 0px 0px 0px' }
+  );
+  observer.observe(sentinel);
+</script>
 </body>
 </html>

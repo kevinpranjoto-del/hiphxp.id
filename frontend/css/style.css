@@ -1176,3 +1176,47 @@ tr:hover td {
   height: 28px;
 }
 
+/* ================================================================
+   STICKY SEARCH BAR (music.html)
+   ================================================================ */
+
+/* Wrapper buat maintain area saat search bar jadi sticky */
+.search-sticky-wrapper {
+  position: relative;
+  z-index: 40;
+  margin-bottom: 28px;
+}
+
+/* State sticky — nempel di bawah nav (top: 74px = tinggi header) */
+.search-sticky-wrapper.is-sticky {
+  position: sticky;
+  top: 74px;
+  z-index: 40;
+  padding: 12px 0;
+  background: rgba(10,10,10,0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(229,52,42,0.25);
+  margin-left: -28px;
+  margin-right: -28px;
+  padding-left: 28px;
+  padding-right: 28px;
+  margin-bottom: 0;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* Saat sticky, search box center di layar */
+.search-sticky-wrapper.is-sticky .search-box {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Spacer buat kompensasi height ketika is-sticky aktif */
+.search-spacer {
+  display: none;
+}
+.search-sticky-wrapper.is-sticky ~ .search-spacer {
+  display: block;
+  height: 68px;
+}
+
