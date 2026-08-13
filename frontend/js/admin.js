@@ -213,6 +213,10 @@ function setupAdminForms() {
   if (formLifestyle) {
     formLifestyle.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const btn = formLifestyle.querySelector('button');
+      const origText = btn ? btn.textContent : 'Publish Lifestyle Post';
+      if (btn) btn.textContent = 'Mempublikasikan...';
+
       const category = document.getElementById('lifestyle-category').value;
       const title = document.getElementById('lifestyle-title').value;
       const slug = document.getElementById('lifestyle-slug').value;
@@ -241,6 +245,8 @@ function setupAdminForms() {
         switchLifestyleSubtab(category);
       } catch (err) {
         await customAlert('Gagal mempublikasikan post lifestyle: ' + err.message);
+      } finally {
+        if (btn) btn.textContent = origText;
       }
     });
   }
@@ -250,6 +256,10 @@ function setupAdminForms() {
   if (formInterview) {
     formInterview.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const btn = formInterview.querySelector('button');
+      const origText = btn ? btn.textContent : 'Publish Interview';
+      if (btn) btn.textContent = 'Mempublikasikan...';
+
       const title = document.getElementById('interview-title').value;
       const slug = document.getElementById('interview-slug').value;
       const content = document.getElementById('interview-content').value;
@@ -273,6 +283,8 @@ function setupAdminForms() {
         loadAdminInterviews();
       } catch (err) {
         await customAlert('Gagal mempublikasikan wawancara: ' + err.message);
+      } finally {
+        if (btn) btn.textContent = origText;
       }
     });
   }

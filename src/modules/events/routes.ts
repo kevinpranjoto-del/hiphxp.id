@@ -43,21 +43,26 @@ router.get('/me', requireAuth, async (req: any, res) => {
   }
 });
 
+const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
 // POST /api/events — create event
 router.post('/', requireAuth, upload.single('poster'), async (req: any, res) => {
   try {
-    const { title, name, slug, category, event_date, city, location, venue, image_url } = req.body;
+    const { title, name, slug: rawSlug, category, event_date, city, location, venue, image_url } = req.body;
 
-    const eventName = title || name;
+    const eventName = (title || name || '').trim();
     const eventVenue = location || venue;
 
-    if (!eventName || !slug || !category) {
-      return res.status(400).json({ message: 'Missing required fields: title/name, slug, category' });
+    if (!eventName || !category) {
+      return res.status(400).json({ message: 'Nama acara dan kategori wajib diisi.' });
     }
 
-    const existing = await prisma.event.findUnique({ where: { slug } });
+    let finalSlug = slugify(rawSlug || eventName);
+    if (!finalSlug) finalSlug = `event-${Date.now()}`;
+
+    const existing = await prisma.event.findUnique({ where: { slug: finalSlug } });
     if (existing) {
-      return res.status(409).json({ message: 'Event with this slug already exists' });
+      finalSlug = `${finalSlug}-${Math.random().toString(36).substring(2, 7)}`;
     }
 
     let finalImageUrl = image_url || null;
@@ -68,10 +73,10 @@ router.post('/', requireAuth, upload.single('poster'), async (req: any, res) => 
     const event = await prisma.event.create({
       data: {
         name: eventName,
-        slug,
+        slug: finalSlug,
         category,
         event_date: event_date ? new Date(event_date) : null,
-        city,
+        city: city || null,
         venue: eventVenue || null,
         image_url: finalImageUrl,
         user_id: req.user.sub,
@@ -79,9 +84,9 @@ router.post('/', requireAuth, upload.single('poster'), async (req: any, res) => 
       }
     });
     res.status(201).json(event);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Failed to create event' });
+  } catch (error: any) {
+    console.error('[POST /api/events] Error:', error?.message || error);
+    res.status(500).json({ message: `Gagal membuat acara: ${error?.message || error}` });
   }
 });
 

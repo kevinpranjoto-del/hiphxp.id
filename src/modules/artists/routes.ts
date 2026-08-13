@@ -86,6 +86,8 @@ router.get('/me/profile', requireAuth, async (req: any, res) => {
   }
 });
 
+const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
 // PUT /api/artists/me/profile — update profil sendiri
 router.put('/me/profile', requireAuth, upload.single('profile_photo'), async (req: any, res) => {
   try {
@@ -97,35 +99,66 @@ router.put('/me/profile', requireAuth, upload.single('profile_photo'), async (re
       profile_photo = `/public/uploads/images/${req.file.filename}`;
     }
 
+    const cleanArtistName = artist_name ? artist_name.trim() : undefined;
+
     const profile = await prisma.musicianProfile.upsert({
       where: { user_id: userId },
       update: {
-        artist_name,
-        real_name,
-        bio,
-        city,
-        whatsapp,
-        instagram,
-        spotify_artist_url,
+        ...(cleanArtistName && { artist_name: cleanArtistName }),
+        ...(real_name !== undefined && { real_name }),
+        ...(bio !== undefined && { bio }),
+        ...(city !== undefined && { city }),
+        ...(whatsapp !== undefined && { whatsapp }),
+        ...(instagram !== undefined && { instagram }),
+        ...(spotify_artist_url !== undefined && { spotify_artist_url }),
         ...(profile_photo && { profile_photo })
       },
       create: {
         user_id: userId,
-        artist_name: artist_name || req.user.email?.split('@')[0] || 'Unknown',
+        artist_name: cleanArtistName || req.user.email?.split('@')[0] || 'Unknown',
         real_name: real_name || '',
-        bio,
-        city,
-        whatsapp,
-        instagram,
-        spotify_artist_url,
+        bio: bio || null,
+        city: city || null,
+        whatsapp: whatsapp || null,
+        instagram: instagram || null,
+        spotify_artist_url: spotify_artist_url || null,
         ...(profile_photo && { profile_photo })
       }
     });
 
+    // Sinkronkan juga data Artist publik jika artist_name ada
+    if (profile.artist_name) {
+      const artistSlug = slugify(profile.artist_name);
+      if (artistSlug) {
+        await prisma.artist.upsert({
+          where: { slug: artistSlug },
+          update: {
+            name: profile.artist_name,
+            real_name: profile.real_name || undefined,
+            bio: profile.bio || undefined,
+            city: profile.city || undefined,
+            instagram: profile.instagram || undefined,
+            spotify: profile.spotify_artist_url || undefined,
+            whatsapp: profile.whatsapp || undefined,
+          },
+          create: {
+            name: profile.artist_name,
+            slug: artistSlug,
+            real_name: profile.real_name || null,
+            bio: profile.bio || null,
+            city: profile.city || null,
+            instagram: profile.instagram || null,
+            spotify: profile.spotify_artist_url || null,
+            whatsapp: profile.whatsapp || null,
+          }
+        }).catch(err => console.warn('[Artist Sync Warning]:', err.message));
+      }
+    }
+
     return res.json(profile);
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Failed to update profile' });
+  } catch (error: any) {
+    console.error('[PUT /api/artists/me/profile] Error:', error);
+    return res.status(500).json({ message: 'Gagal memperbarui profil: ' + (error.message || error) });
   }
 });
 
