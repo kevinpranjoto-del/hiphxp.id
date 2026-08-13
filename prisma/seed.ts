@@ -1,4 +1,5 @@
 import { PrismaClient, EventCategory, ArticleStatus, DirectoryStatus } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
@@ -401,6 +402,40 @@ async function main() {
     }
   });
   console.log('✅ Editorial Interviews seeded');
+
+  // ─── 12. ADMIN USERS ──────────────────────────────────────────────────────
+  const defaultPasswordHash = await bcrypt.hash('admin123', 10);
+  const adminUsers = [
+    { email: 'admin@gmail.com', name: 'Super Admin', real_name: 'Administrator 1' },
+    { email: 'admin2@gmail.com', name: 'Admin Skena', real_name: 'Administrator 2' },
+  ];
+  for (const adm of adminUsers) {
+    const existing = await prisma.user.findUnique({ where: { email: adm.email } });
+    if (!existing) {
+      await prisma.user.create({
+        data: {
+          email: adm.email,
+          password_hash: defaultPasswordHash,
+          account_type: 'ADMIN',
+          email_verified: true,
+          musician_profile: {
+            create: {
+              artist_name: adm.name,
+              real_name: adm.real_name,
+              is_verified: true,
+              verification_status: 'APPROVED',
+            }
+          }
+        }
+      });
+    } else {
+      await prisma.user.update({
+        where: { email: adm.email },
+        data: { account_type: 'ADMIN' },
+      });
+    }
+  }
+  console.log('✅ Admin users seeded');
 
   console.log('\n🎉 Seeding complete!');
 }

@@ -247,19 +247,27 @@ router.get('/lifestyle/:category', async (req, res) => {
   }
 });
 
+const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
 router.post('/lifestyle/:category', upload.single('image'), async (req: any, res) => {
   try {
     const { category } = req.params;
-    const { title, slug, content, city, province } = req.body;
-    if (!title || !slug || !content) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    const { title, slug: rawSlug, content, city, province } = req.body;
+    if (!title || !content) {
+      return res.status(400).json({ message: 'Judul dan konten wajib diisi' });
     }
+    let finalSlug = slugify(rawSlug || title);
+    if (!finalSlug) finalSlug = `post-${Date.now()}`;
+    
+    // Append random suffix if slug collision
+    finalSlug = `${finalSlug}-${Math.random().toString(36).substring(2, 6)}`;
+
     let featured_image = null;
     if (req.file) {
       featured_image = `/public/uploads/images/${req.file.filename}`;
     }
     let post;
-    const data = { title, slug, content, city, province, featured_image, status: 'PUBLISHED' as any };
+    const data = { title: title.trim(), slug: finalSlug, content, city: city || null, province: province || null, featured_image, status: 'PUBLISHED' as any };
     if (category === 'streetwear') {
       post = await prisma.streetwearPost.create({ data });
     } else if (category === 'graffiti') {
@@ -275,7 +283,7 @@ router.post('/lifestyle/:category', upload.single('image'), async (req: any, res
     }
     res.status(201).json(post);
   } catch (error: any) {
-    res.status(500).json({ message: 'Failed to create post: ' + error.message });
+    res.status(500).json({ message: 'Gagal membuat post: ' + error.message });
   }
 });
 
@@ -317,20 +325,24 @@ router.get('/interviews', async (_req, res) => {
 
 router.post('/interviews', upload.single('image'), async (req: any, res) => {
   try {
-    const { title, slug, content } = req.body;
-    if (!title || !slug || !content) {
-      return res.status(400).json({ message: 'Missing required fields' });
+    const { title, slug: rawSlug, content } = req.body;
+    if (!title || !content) {
+      return res.status(400).json({ message: 'Judul dan konten wawancara wajib diisi' });
     }
+    let finalSlug = slugify(rawSlug || title);
+    if (!finalSlug) finalSlug = `interview-${Date.now()}`;
+    finalSlug = `${finalSlug}-${Math.random().toString(36).substring(2, 6)}`;
+
     let featured_image = null;
     if (req.file) {
       featured_image = `/public/uploads/images/${req.file.filename}`;
     }
     const interview = await prisma.interview.create({
-      data: { title, slug, content, featured_image, status: 'PUBLISHED' as any }
+      data: { title: title.trim(), slug: finalSlug, content, featured_image, status: 'PUBLISHED' as any }
     });
     res.status(201).json(interview);
   } catch (error: any) {
-    res.status(500).json({ message: 'Failed to create interview: ' + error.message });
+    res.status(500).json({ message: 'Gagal membuat wawancara: ' + error.message });
   }
 });
 

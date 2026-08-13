@@ -302,6 +302,8 @@ section { padding: 88px 0; border-bottom: 1px solid var(--grey-line); }
    PARTNERSHIP / RATE CARD
    ================================================================ */
 .partnership { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--grey-line); }
+.partnership:has(.partnership-info[style*="display: none"]),
+.partnership:has(.partnership-info.is-hidden) { grid-template-columns: 1fr; max-width: 680px; margin: 0 auto; }
 .partnership-info { padding: 44px; }
 .partnership-info h2 { font-size: clamp(28px,3.6vw,42px); margin-bottom: 16px; }
 .partnership-info p { color: var(--grey); font-size: 14.5px; line-height: 1.6; max-width: 440px; margin-bottom: 30px; }

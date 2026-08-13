@@ -72,15 +72,19 @@ router.get('/:slug', async (req, res) => {
 // POST /api/songs — tambah lagu baru
 router.post('/', requireAuth, upload.fields([{ name: 'audio', maxCount: 1 }, { name: 'cover', maxCount: 1 }]), async (req: any, res) => {
   try {
-    const { title, slug, genre_id, producer_id, release_date, meaning } = req.body;
+    const { title, slug: rawSlug, genre_id, producer_id, release_date, meaning } = req.body;
 
-    if (!title || !slug) {
-      return res.status(400).json({ message: 'Missing required fields: title, slug' });
+    if (!title || !title.trim()) {
+      return res.status(400).json({ message: 'Judul lagu wajib diisi.' });
     }
 
-    const existing = await prisma.song.findUnique({ where: { slug } });
+    let finalSlug = slugify(rawSlug || title);
+    if (!finalSlug) finalSlug = `song-${Date.now()}`;
+
+    // Check slug collision and generate unique slug if needed
+    const existing = await prisma.song.findUnique({ where: { slug: finalSlug } });
     if (existing) {
-      return res.status(409).json({ message: 'Song with this slug already exists' });
+      finalSlug = `${finalSlug}-${Math.random().toString(36).substring(2, 7)}`;
     }
 
     // Ambil profile musisi untuk menemukan/membuat Artist
@@ -88,25 +92,28 @@ router.post('/', requireAuth, upload.fields([{ name: 'audio', maxCount: 1 }, { n
       where: { user_id: req.user.sub }
     });
 
-    if (!profile) {
-      return res.status(400).json({ message: 'Lengkapi profil musisi Anda terlebih dahulu sebelum mengunggah lagu.' });
+    if (!profile || !profile.artist_name || !profile.artist_name.trim()) {
+      return res.status(400).json({ message: 'Lengkapi nama panggung (artist name) di profil Anda terlebih dahulu sebelum mengunggah lagu.' });
     }
 
-    const artistSlug = slugify(profile.artist_name);
+    const artistName = profile.artist_name.trim();
+    let artistSlug = slugify(artistName);
+    if (!artistSlug) artistSlug = `artist-${req.user.sub.substring(0, 8)}`;
+
     let artist = await prisma.artist.findUnique({ where: { slug: artistSlug } });
 
     if (!artist) {
       // Buat data artist baru jika belum ada
       artist = await prisma.artist.create({
         data: {
-          name: profile.artist_name,
+          name: artistName,
           slug: artistSlug,
-          real_name: profile.real_name,
-          bio: profile.bio,
-          city: profile.city,
-          instagram: profile.instagram,
-          spotify: profile.spotify_artist_url,
-          whatsapp: profile.whatsapp,
+          real_name: profile.real_name || null,
+          bio: profile.bio || null,
+          city: profile.city || null,
+          instagram: profile.instagram || null,
+          spotify: profile.spotify_artist_url || null,
+          whatsapp: profile.whatsapp || null,
         }
       });
     }
@@ -125,8 +132,8 @@ router.post('/', requireAuth, upload.fields([{ name: 'audio', maxCount: 1 }, { n
 
     const song = await prisma.song.create({
       data: {
-        title,
-        slug,
+        title: title.trim(),
+        slug: finalSlug,
         artist_id: artist.id,
         user_id: req.user.sub,
         genre_id: genre_id || null,
@@ -137,7 +144,7 @@ router.post('/', requireAuth, upload.fields([{ name: 'audio', maxCount: 1 }, { n
         ...(meaning ? {
           song_meaning: {
             create: {
-              content: meaning
+              content: meaning.trim()
             }
           }
         } : {})
@@ -147,8 +154,8 @@ router.post('/', requireAuth, upload.fields([{ name: 'audio', maxCount: 1 }, { n
 
     return res.status(201).json(song);
   } catch (error: any) {
-    console.error('[POST /api/songs] Prisma error:', error?.message || error);
-    return res.status(500).json({ message: `Failed to create song: ${error?.message || error}` });
+    console.error('[POST /api/songs] Error:', error?.message || error);
+    return res.status(500).json({ message: `Gagal menambahkan lagu: ${error?.message || error}` });
   }
 });
 

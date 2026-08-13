@@ -242,13 +242,32 @@ window.initDashboard = function() {
     });
   }
 
+  // Auto-slug generator untuk form lagu
+  const songTitleEl = document.getElementById('song-title');
+  const songSlugEl = document.getElementById('song-slug');
+  if (songTitleEl && songSlugEl) {
+    songTitleEl.addEventListener('input', () => {
+      if (!songSlugEl.dataset.userEdited) {
+        songSlugEl.value = songTitleEl.value
+          .toLowerCase()
+          .replace(/[^a-z0-9 -]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-');
+      }
+    });
+    songSlugEl.addEventListener('input', () => {
+      songSlugEl.dataset.userEdited = 'true';
+    });
+  }
+
   // Form Upload Rilisan (Lagu)
   const songForm = document.getElementById('form-song');
   if (songForm) {
     songForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = songForm.querySelector('button');
-      btn.textContent = 'Mengunggah...';
+      const origText = btn ? btn.textContent : 'Publish Lagu';
+      if (btn) btn.textContent = 'Mengunggah...';
 
       try {
         const formData = new FormData();
@@ -258,29 +277,33 @@ window.initDashboard = function() {
         formData.append('meaning', document.getElementById('song-meaning').value);
         
         const tokenPayload = getDecodedToken();
-        formData.append('artist_id', tokenPayload.id); 
+        if (tokenPayload && tokenPayload.id) {
+          formData.append('artist_id', tokenPayload.id);
+        }
 
         const audioInput = document.getElementById('song-audio');
-        if (audioInput.files[0]) formData.append('audio', audioInput.files[0]);
+        if (audioInput && audioInput.files[0]) formData.append('audio', audioInput.files[0]);
         
         const coverInput = document.getElementById('song-cover');
-        if (coverInput.files[0]) formData.append('cover', coverInput.files[0]);
+        if (coverInput && coverInput.files[0]) formData.append('cover', coverInput.files[0]);
         
         await submitSong(formData, localStorage.getItem('access_token'));
-        await customAlert('Rilisan berhasil diunggah!');
+        await customAlert('Rilisan lagu berhasil diunggah!');
         songForm.reset();
+        if (songSlugEl) delete songSlugEl.dataset.userEdited;
         loadMySongs(); // Refresh songs list
       } catch (err) {
         await customAlert('Gagal mengunggah rilisan: ' + err.message);
       } finally {
-        btn.textContent = 'PUBLISH LAGU';
+        if (btn) btn.textContent = origText;
       }
     });
   }
   
-  // Let's implement a simple toast
+  // Toast helper
   function showToast(msg) {
     const t = document.getElementById('toast');
+    if (!t) return;
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
@@ -314,37 +337,44 @@ window.initDashboard = function() {
     });
   }
   
-  
-    // Submit Event
+  // Submit Event
   const formEvent = document.getElementById('form-event');
   if (formEvent) {
     formEvent.addEventListener('submit', async (e) => {
       e.preventDefault();
+      const btn = formEvent.querySelector('button');
+      const origText = btn ? btn.textContent : 'Buat Acara';
+      if (btn) btn.textContent = 'Mengirim...';
+
+      const titleVal = document.getElementById('event-title').value;
+      const cleanSlug = titleVal.toLowerCase().replace(/[^a-z0-9 -]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-');
       
       const formData = new FormData();
-      formData.append('title', document.getElementById('event-title').value);
-      formData.append('slug', document.getElementById('event-title').value.toLowerCase().replace(/ /g, '-'));
+      formData.append('title', titleVal);
+      formData.append('slug', cleanSlug);
       formData.append('category', document.getElementById('event-category').value);
       formData.append('event_date', document.getElementById('event-date').value);
       formData.append('city', document.getElementById('event-city').value);
       formData.append('location', document.getElementById('event-location').value);
       
       const posterInput = document.getElementById('event-poster');
-      if (posterInput.files[0]) {
+      if (posterInput && posterInput.files[0]) {
         formData.append('poster', posterInput.files[0]);
       }
     
       try {
         const res = await submitEvent(formData, token);
-        if (res.id) {
-          showToast('Acara berhasil dijadwalkan!');
+        if (res && res.id) {
+          await customAlert('Acara berhasil dijadwalkan!');
           e.target.reset();
           loadMyEvents(); // Refresh events list
         } else {
-          showToast(res.message || 'Gagal membuat acara.');
+          await customAlert('Gagal membuat acara: ' + (res.message || 'Terjadi kesalahan'));
         }
       } catch (err) {
-        showToast('Terjadi kesalahan pada sistem.');
+        await customAlert('Gagal membuat acara: ' + err.message);
+      } finally {
+        if (btn) btn.textContent = origText;
       }
     });
   }

@@ -103,7 +103,18 @@ app.get('/api/docs', (_req, res) => res.json({
   ],
 }));
 
+import multer from 'multer';
+
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  if (err instanceof multer.MulterError) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({ message: 'Ukuran file terlalu besar. Maksimal 50MB.' });
+    }
+    return res.status(400).json({ message: `Gagal mengunggah file: ${err.message}` });
+  }
+  if (err.message && (err.message.includes('Format file tidak didukung') || err.message.includes('Hanya file audio'))) {
+    return res.status(400).json({ message: err.message });
+  }
   console.error(err);
   res.status(err.status || 500).json({ message: err.message || 'Internal server error' });
 });
